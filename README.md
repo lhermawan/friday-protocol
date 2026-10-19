@@ -7,12 +7,12 @@
 > **F**ramework for **R**igorous, **I**ntelligent, **D**eliberate, and **A**utonomous **Y**ields  
 > *The Spec-Driven, DevSecOps-First, and Anti-Hallucination Governance Protocol for Autonomous AI Agents.*
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/friday-protocol"><img src="https://img.shields.io/npm/v/friday-protocol.svg?color=cb3837" alt="npm version" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
-  <img src="https://img.shields.io/badge/Supports-Antigravity%20%7C%20Claude%20Code%20%7C%20Cursor%20%7C%20Windsurf-orange.svg" alt="Platform Support" />
-  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" />
-</p>
+[![npm version](https://img.shields.io/npm/v/friday-protocol.svg?style=flat&color=cb3837)](https://www.npmjs.com/package/friday-protocol)
+[![npm downloads](https://img.shields.io/npm/dm/friday-protocol.svg?style=flat&color=blue)](https://www.npmjs.com/package/friday-protocol)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Platform Support](https://img.shields.io/badge/Supports-Antigravity%20%7C%20Claude%20Code%20%7C%20Cursor%20%7C%20Windsurf-orange.svg)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)]()
+
 
 ---
 
