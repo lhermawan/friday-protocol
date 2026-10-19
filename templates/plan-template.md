@@ -2,7 +2,7 @@
 
 > **Protocol:** FRIDAY-PROTOCOL v1.0.0  
 > **Status:** PENDING OPERATOR APPROVAL  
-> **Gatekeeper:** Zero-Tool Turn Termination Active (Awaiting `['OKE', 'Proceed', 'Lanjut', 'Approve']`)
+> **Gatekeeper:** Zero-Tool Turn Termination Active (Awaiting `['LGTM', 'CONFIRMED', 'EXECUTE', 'GO', 'OKE', 'GASS']`)
 
 ---
 

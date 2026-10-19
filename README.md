@@ -34,7 +34,7 @@ Most AI agents today suffer from three critical flaws:
 
 Even when the user enables `--dangerously-skip-permissions`, YOLO mode, or `Always Proceed`:
 - **Zero-Tool Turn Termination:** Once the plan is drafted, the agent executes **zero tools**, forcing the autonomous loop to halt and yielding control back to the operator.
-- **Semantic Approval Token:** Code editing tools are programmatically locked until the operator inputs an explicit token: `['OKE', 'Proceed', 'Lanjut', 'Approve']`.
+- **Semantic Approval Token:** Code editing tools are programmatically locked until the operator explicitly inputs a manual token: `['LGTM', 'CONFIRMED', 'EXECUTE', 'GO', 'OKE', 'GASS']`.
 - **Pre-Tool Hook Gate:** Real-time hook interceptors abort unauthorized write attempts.
 
 ---
@@ -95,7 +95,7 @@ flowchart TD
     
     E --> F["Phase 3: The Iron Gate (ZERO TOOLS - Await User Approval)"]
     F -->|"User Requests Revision"| E
-    F -->|"User Inputs OKE / Approve"| G["Phase 4: Blueprint Recap"]
+    F -->|"User Inputs LGTM / GO / OKE"| G["Phase 4: Blueprint Recap"]
     
     G --> H["Phase 5: Clean Implementation"]
     H --> I["Phase 6: SAST & Security Hardening (Patch in Place)"]
