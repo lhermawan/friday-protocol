@@ -1,0 +1,39 @@
+{
+  "name": "friday-protocol",
+  "version": "1.0.0",
+  "description": "Spec-Driven, DevSecOps-First, and Anti-Hallucination Governance Protocol for Autonomous AI Agents",
+  "main": "bin/cli.js",
+  "bin": {
+    "friday-protocol": "./bin/cli.js"
+  },
+  "keywords": [
+    "ai-agent",
+    "governance",
+    "antigravity",
+    "claude-code",
+    "cursor",
+    "windsurf",
+    "devsecops",
+    "spec-driven",
+    "clack",
+    "cli"
+  ],
+  "author": "Lucky Hermawan & FRIDAY",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lhermawan/friday-protocol.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lhermawan/friday-protocol/issues"
+  },
+  "homepage": "https://github.com/lhermawan/friday-protocol#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "picocolors": "^1.1.1"
+  }
+}

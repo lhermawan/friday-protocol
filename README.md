@@ -39,21 +39,45 @@ Even when the user enables `--dangerously-skip-permissions`, YOLO mode, or `Alwa
 
 ---
 
-## 🚀 One-Line Installation
+## 🚀 Quick Start (Zero-Install CLI)
 
-### Windows (PowerShell)
+Run directly via `npx` (no cloning or pre-installation needed):
+
+```bash
+npx friday-protocol
+```
+
+Or pass flags for silent/automated CI environments:
+```bash
+# Universal global setup
+npx friday-protocol -y
+
+# Specific agent & workspace scope
+npx friday-protocol --env antigravity --scope workspace -y
+```
+
+---
+
+### Alternative: Direct Shell Scripts
+
+<details>
+<summary><b>Windows (PowerShell)</b></summary>
+
 ```powershell
 irm https://raw.githubusercontent.com/lhermawan/friday-protocol/main/install.ps1 | iex
 ```
-*(Or clone and run `./install.ps1`)*
+</details>
 
-### Linux / macOS (Bash)
+<details>
+<summary><b>Linux / macOS (Bash)</b></summary>
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/lhermawan/friday-protocol/main/install.sh | bash
 ```
+</details>
 
-The interactive installer will ask:
-1. **Target Agent Environment:** Antigravity (Gemini), Claude Code, Cursor, Windsurf, or All.
+The interactive installer will prompt:
+1. **Target Agent Environment:** Antigravity (Gemini), Claude Code, Cursor, Windsurf, or Universal (All).
 2. **Installation Scope:** Global (machine-wide) or Workspace-specific.
 3. **Second Brain / Cognitive Mode:** Enable MCP Knowledge Graph integration (with DSS) or pure Standalone DevSecOps.
 
