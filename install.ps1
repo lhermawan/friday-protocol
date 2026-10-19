@@ -42,11 +42,16 @@ $isCognitive = ($hasBrain -match "^[yY]")
 
 Write-Host "`n>>> Configuring FRIDAY-PROTOCOL ($($ifCognitive = if ($isCognitive) {'Cognitive Mode'} else {'Standalone DevSecOps Mode'} ; $ifCognitive))..." -ForegroundColor Cyan
 
+$cognitiveModeTitle = if ($isCognitive) {'COGNITIVE MODE'} else {'STANDALONE MODE'}
+$law5Text = if ($isCognitive) { "5. **Law of Cognitive Closed-Loop:** Must query DSS before planning (`recall` mode 'dss'), and retain solutions to Second Brain (`retain` & `reflect`) after UAT." } else { "5. **Law of Local Audit:** Record all architectural decisions and verified solutions to a local changelog or markdown report upon completion." }
+$phase1DssText = if ($isCognitive) { " (Query DSS for precedents)" } else { "" }
+$phase8RetainText = if ($isCognitive) { "Retain knowledge to Second Brain graph." } else { "Document verified outcome." }
+
 # Rule Content Definition
 $ruleSnippet = @"
 
 <!-- BEGIN FRIDAY-PROTOCOL (AUTO-INJECTED) -->
-# 🛡️ FRIDAY-PROTOCOL: PRIMARY GOVERNANCE LAW ($($if ($isCognitive) {'COGNITIVE MODE'} else {'STANDALONE MODE'}))
+# 🛡️ FRIDAY-PROTOCOL: PRIMARY GOVERNANCE LAW ($cognitiveModeTitle)
 All engineering tasks, feature additions, coding, refactors, and system modifications MUST 100% strictly adhere to this protocol:
 
 ## 1. THE 5 IRON LAWS
@@ -54,7 +59,7 @@ All engineering tasks, feature additions, coding, refactors, and system modifica
 2. **Law of 6D Lifecycle Matrix:** Must map the entire feature journey across all 6 dimensions (*Source -> Runtime State -> Persistence -> Downstream Consumers -> Security/RBAC -> Failure Modes*).
 3. **Law of Security-First:** SAST and multi-role access control checks must pass BEFORE functional UAT to eliminate regression loops.
 4. **Law of Empirical Proof:** Never declare completion without objective proof (exit code 0, HTTP 200 OK, terminal logs).
-$($if ($isCognitive) { "5. **Law of Cognitive Closed-Loop:** Must query DSS before planning (`recall` mode 'dss'), and retain solutions to Second Brain (`retain` & `reflect`) after UAT." } else { "5. **Law of Local Audit:** Record all architectural decisions and verified solutions to a local changelog or markdown report upon completion." })
+$law5Text
 
 ## 2. HARD ANTI-BYPASS LOCK (ALWAYS-PROCEED PROOF)
 Even if 'Always Proceed', auto-approval, or YOLO mode is enabled:
@@ -65,14 +70,14 @@ Even if 'Always Proceed', auto-approval, or YOLO mode is enabled:
 ## 3. THE 8-PHASE EXECUTION PIPELINE
 - **Fast-Path (Q&A / Info / Status):** Answer directly, concisely, without plan bureaucracy.
 - **Execution-Path (Feature / Coding / Config / Fix):**
-  1. *Phase 1 (Intent Analysis):* Analyze scope and requirements $($if ($isCognitive) { "(Query DSS for precedents)" } else { "" }).
+  1. *Phase 1 (Intent Analysis):* Analyze scope and requirements$phase1DssText.
   2. *Phase 2 (6D Lifecycle Planning):* Create Implementation Plan detailing all 6 dimensions.
   3. *Phase 3 (The Iron Gate):* ZERO TOOLS. Halt turn. Await User approval token.
   4. *Phase 4 (Blueprint Recap):* Summarize confirmed files and execution scope.
   5. *Phase 5 (Clean Implementation):* Write minimal, secure, surgical code.
   6. *Phase 6 (SAST & Security Gate):* Audit OWASP Top 10, BFLA, channel isolation, and least privilege. Patch vulnerabilities immediately.
   7. *Phase 7 (Empirical UAT):* Verify full chain (Preview -> Save -> Downstream Export) + anti-regression + multi-role check. Gather terminal proof.
-  8. *Phase 8 (Completion & Sign-off):* $($if ($isCognitive) { "Retain knowledge to Second Brain graph." } else { "Document verified outcome." }) Present evidence-backed summary.
+  8. *Phase 8 (Completion & Sign-off):* $phase8RetainText Present evidence-backed summary.
 <!-- END FRIDAY-PROTOCOL -->
 "@
 
