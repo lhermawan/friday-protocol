@@ -3,8 +3,22 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { fileURLToPath } from 'node:url';
 import * as p from '@clack/prompts';
 import pc from 'picocolors';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const packageRoot = path.resolve(__dirname, '..');
+
+function copyDirectory(src, dest) {
+  if (!fs.existsSync(src)) return false;
+  if (!fs.existsSync(dest)) {
+    fs.mkdirSync(dest, { recursive: true });
+  }
+  fs.cpSync(src, dest, { recursive: true, force: true });
+  return true;
+}
 
 function getRuleContent(isCognitive) {
   const cognitiveModeTitle = isCognitive ? 'COGNITIVE MODE' : 'STANDALONE MODE';
@@ -186,15 +200,63 @@ ${pc.bold('OPTIONS:')}
     );
   }
 
+  // 1. Inject Governance Rules
   for (const targetPath of targets) {
     const res = injectRuleFile(targetPath, ruleSnippet);
     results.push(res);
   }
 
-  s.stop('Governance rules successfully applied!');
+  // 2. Install Skills & Templates
+  const srcSkillsDir = path.join(packageRoot, 'skills', 'friday-protocol');
+  const srcTemplatesDir = path.join(packageRoot, 'templates');
+  const skillDestinations = [];
+
+  if (targetEnv === 'all' || targetEnv === 'antigravity') {
+    const dest = scope === 'global'
+      ? path.join(userHome, '.gemini', 'config', 'skills', 'friday-protocol')
+      : path.join(process.cwd(), '.agents', 'skills', 'friday-protocol');
+    skillDestinations.push({ platform: 'Antigravity Skill', path: dest });
+  }
+
+  if (targetEnv === 'all' || targetEnv === 'claude') {
+    const dest = scope === 'global'
+      ? path.join(userHome, '.claude', 'skills', 'friday-protocol')
+      : path.join(process.cwd(), '.claude', 'skills', 'friday-protocol');
+    skillDestinations.push({ platform: 'Claude Skill', path: dest });
+  }
+
+  if (targetEnv === 'all' || targetEnv === 'cursor') {
+    const dest = scope === 'global'
+      ? path.join(userHome, '.cursor', 'skills', 'friday-protocol')
+      : path.join(process.cwd(), '.cursor', 'skills', 'friday-protocol');
+    skillDestinations.push({ platform: 'Cursor Skill', path: dest });
+  }
+
+  for (const item of skillDestinations) {
+    const copied = copyDirectory(srcSkillsDir, item.path);
+    if (copied) {
+      results.push({ status: 'skill', path: item.path, desc: item.platform });
+    }
+  }
+
+  // Optional: Copy templates to workspace if in workspace mode
+  if (scope === 'workspace') {
+    const destTemplates = path.join(process.cwd(), '.friday', 'templates');
+    const copiedTpl = copyDirectory(srcTemplatesDir, destTemplates);
+    if (copiedTpl) {
+      results.push({ status: 'skill', path: destTemplates, desc: 'Friday Templates' });
+    }
+  }
+
+  s.stop('Governance rules & skills successfully applied!');
 
   for (const r of results) {
-    const icon = r.status === 'updated' ? pc.yellow('[UPDATED]') : pc.green('[INJECTED]');
+    let icon = pc.green('[INJECTED]');
+    if (r.status === 'updated') {
+      icon = pc.yellow('[UPDATED]');
+    } else if (r.status === 'skill') {
+      icon = pc.cyan('[SKILL INSTALLED]');
+    }
     p.log.success(`${icon} ${pc.dim(r.path)}`);
   }
 

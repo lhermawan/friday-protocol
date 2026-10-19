@@ -101,20 +101,44 @@ inject_rule() {
     fi
 }
 
+install_skills() {
+    local dest="$1"
+    mkdir -p "$dest/references"
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -d "$script_dir/skills/friday-protocol" ]; then
+        cp -r "$script_dir/skills/friday-protocol/"* "$dest/"
+        echo -e "  \033[0;36m[SKILL INSTALLED]\033[0m $dest"
+    else
+        local base_uri="https://raw.githubusercontent.com/lhermawan/friday-protocol/main/skills/friday-protocol"
+        curl -fsSL "$base_uri/SKILL.md" -o "$dest/SKILL.md" 2>/dev/null || true
+        curl -fsSL "$base_uri/references/6d-matrix.md" -o "$dest/references/6d-matrix.md" 2>/dev/null || true
+        curl -fsSL "$base_uri/references/sast-checklist.md" -o "$dest/references/sast-checklist.md" 2>/dev/null || true
+        curl -fsSL "$base_uri/references/dss-integration.md" -o "$dest/references/dss-integration.md" 2>/dev/null || true
+        echo -e "  \033[0;36m[SKILL DOWNLOADED & INSTALLED]\033[0m $dest"
+    fi
+}
+
 # Apply targets
 if [ "$envChoice" -eq 1 ] || [ "$envChoice" -eq 4 ]; then
     [ "$scopeChoice" -eq 1 ] && target="$HOME/.gemini/config/rules/GEMINI.md" || target="./.agents/rules/GEMINI.md"
     inject_rule "$target"
+    [ "$scopeChoice" -eq 1 ] && skill_dest="$HOME/.gemini/config/skills/friday-protocol" || skill_dest="./.agents/skills/friday-protocol"
+    install_skills "$skill_dest"
 fi
 
 if [ "$envChoice" -eq 2 ] || [ "$envChoice" -eq 4 ]; then
     [ "$scopeChoice" -eq 1 ] && target="$HOME/.claude/CLAUDE.md" || target="./CLAUDE.md"
     inject_rule "$target"
+    [ "$scopeChoice" -eq 1 ] && skill_dest="$HOME/.claude/skills/friday-protocol" || skill_dest="./.claude/skills/friday-protocol"
+    install_skills "$skill_dest"
 fi
 
 if [ "$envChoice" -eq 3 ] || [ "$envChoice" -eq 4 ]; then
     [ "$scopeChoice" -eq 1 ] && target="$HOME/.cursorrules" || target="./.cursorrules"
     inject_rule "$target"
+    [ "$scopeChoice" -eq 1 ] && skill_dest="$HOME/.cursor/skills/friday-protocol" || skill_dest="./.cursor/skills/friday-protocol"
+    install_skills "$skill_dest"
 fi
 
 echo ""

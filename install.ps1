@@ -105,22 +105,52 @@ function Inject-RuleFile {
     }
 }
 
-$userHome = [Environment]::GetFolderPath("UserProfile")
+function Install-SkillFiles {
+    param([string]$DestDir)
+    if (!(Test-Path $DestDir)) { New-Item -ItemType Directory -Path $DestDir -Force | Out-Null }
+    
+    $localSkill = Join-Path $PSScriptRoot "skills\friday-protocol"
+    if (Test-Path $localSkill) {
+        Copy-Item -Path "$localSkill\*" -Destination $DestDir -Recurse -Force
+        Write-Host "  [SKILL INSTALLED] $DestDir" -ForegroundColor Cyan
+    } else {
+        # Remote fallback via GitHub raw
+        $baseUri = "https://raw.githubusercontent.com/lhermawan/friday-protocol/main/skills/friday-protocol"
+        $refDir = Join-Path $DestDir "references"
+        if (!(Test-Path $refDir)) { New-Item -ItemType Directory -Path $refDir -Force | Out-Null }
+        
+        try {
+            Invoke-WebRequest -Uri "$baseUri/SKILL.md" -OutFile (Join-Path $DestDir "SKILL.md") -UseBasicParsing | Out-Null
+            Invoke-WebRequest -Uri "$baseUri/references/6d-matrix.md" -OutFile (Join-Path $refDir "6d-matrix.md") -UseBasicParsing | Out-Null
+            Invoke-WebRequest -Uri "$baseUri/references/sast-checklist.md" -OutFile (Join-Path $refDir "sast-checklist.md") -UseBasicParsing | Out-Null
+            Invoke-WebRequest -Uri "$baseUri/references/dss-integration.md" -OutFile (Join-Path $refDir "dss-integration.md") -UseBasicParsing | Out-Null
+            Write-Host "  [SKILL DOWNLOADED & INSTALLED] $DestDir" -ForegroundColor Cyan
+        } catch {
+            Write-Host "  [WARN] Failed to download skill files: $_" -ForegroundColor Yellow
+        }
+    }
+}
 
 # Targets Mapping
 if ($envChoice -in @("1", "4")) {
     $target = if ($scopeChoice -eq "1") { "$userHome\.gemini\config\rules\GEMINI.md" } else { ".\.agents\rules\GEMINI.md" }
     Inject-RuleFile -FilePath $target
+    $skillDest = if ($scopeChoice -eq "1") { "$userHome\.gemini\config\skills\friday-protocol" } else { ".\.agents\skills\friday-protocol" }
+    Install-SkillFiles -DestDir $skillDest
 }
 
 if ($envChoice -in @("2", "4")) {
     $target = if ($scopeChoice -eq "1") { "$userHome\.claude\CLAUDE.md" } else { ".\CLAUDE.md" }
     Inject-RuleFile -FilePath $target
+    $skillDest = if ($scopeChoice -eq "1") { "$userHome\.claude\skills\friday-protocol" } else { ".\.claude\skills\friday-protocol" }
+    Install-SkillFiles -DestDir $skillDest
 }
 
 if ($envChoice -in @("3", "4")) {
     $target = if ($scopeChoice -eq "1") { "$userHome\.cursorrules" } else { ".\.cursorrules" }
     Inject-RuleFile -FilePath $target
+    $skillDest = if ($scopeChoice -eq "1") { "$userHome\.cursor\skills\friday-protocol" } else { ".\.cursor\skills\friday-protocol" }
+    Install-SkillFiles -DestDir $skillDest
 }
 
 Write-Host ""
