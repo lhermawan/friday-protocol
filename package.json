@@ -1,10 +1,10 @@
 {
   "name": "friday-protocol",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Spec-Driven, DevSecOps-First, and Anti-Hallucination Governance Protocol for Autonomous AI Agents",
-  "main": "bin/cli.js",
+  "main": "./bin/cli.js",
   "bin": {
-    "friday-protocol": "./bin/cli.js"
+    "friday-protocol": "bin/cli.js"
   },
   "keywords": [
     "ai-agent",
