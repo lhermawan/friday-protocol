@@ -1,0 +1,35 @@
+# ==============================================================================
+# 🛡️ FRIDAY-PROTOCOL: Git Pre-Commit Security Hooks
+# Compliant with BSSN Secure App Framework & DevSecOps Shift-Left
+# ==============================================================================
+# Installation:
+#   pip install pre-commit
+#   pre-commit install
+# ==============================================================================
+
+repos:
+  # 1. Secret Detection (Gitleaks)
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
+        name: 🔍 Gitleaks Secret Detection
+        description: Detect hardcoded secrets, keys, and tokens before commit
+
+  # 2. General Git Hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        name: 🧹 Trim Trailing Whitespace
+      - id: end-of-file-fixer
+        name: 📄 Ensure Single Line Ending
+      - id: check-yaml
+        name: ⚙️ Validate YAML Syntax
+      - id: check-json
+        name: ⚙️ Validate JSON Syntax
+      - id: check-merge-conflict
+        name: 🚫 Check for Unresolved Merge Conflicts
+      - id: check-added-large-files
+        name: 📦 Block Accidental Large Binary Files
+        args: ['--maxkb=5120'] # Block files larger than 5MB

@@ -11,6 +11,51 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const packageRoot = path.resolve(__dirname, '..');
 
+const pkg = JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'), 'utf-8'));
+const currentVersion = pkg.version;
+
+function compareSemver(v1, v2) {
+  const p1 = (v1 || '0.0.0').split('-')[0].split('.').map(n => parseInt(n, 10) || 0);
+  const p2 = (v2 || '0.0.0').split('-')[0].split('.').map(n => parseInt(n, 10) || 0);
+  for (let i = 0; i < 3; i++) {
+    if ((p1[i] || 0) > (p2[i] || 0)) return 1;
+    if ((p1[i] || 0) < (p2[i] || 0)) return -1;
+  }
+  return 0;
+}
+
+async function checkRemoteUpdate() {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 1500);
+    const res = await fetch('https://registry.npmjs.org/friday-protocol/latest', {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'friday-protocol-cli' }
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data && data.version && compareSemver(data.version, currentVersion) > 0) {
+      return data.version;
+    }
+  } catch {
+    // Silent fail if offline or timeout
+  }
+  return null;
+}
+
+function showUpdateBox(current, latest) {
+  console.log(`
+${pc.yellow('╭────────────────────────────────────────────────────────────╮')}
+${pc.yellow('│')}                                                            ${pc.yellow('│')}
+${pc.yellow('│')}   🔔  ${pc.bold('Update available:')} ${pc.dim(current)} → ${pc.green(pc.bold(latest))}               ${pc.yellow('│')}
+${pc.yellow('│')}   Run: ${pc.cyan('npx friday-protocol@latest')} or ${pc.cyan('npm i -g friday-protocol')}  ${pc.yellow('│')}
+${pc.yellow('│')}   Or run: ${pc.magenta('npx friday-protocol --update')}                           ${pc.yellow('│')}
+${pc.yellow('│')}                                                            ${pc.yellow('│')}
+${pc.yellow('╰────────────────────────────────────────────────────────────╯')}
+`);
+}
+
 function copyDirectory(src, dest) {
   if (!fs.existsSync(src)) return false;
   if (!fs.existsSync(dest)) {
@@ -20,25 +65,35 @@ function copyDirectory(src, dest) {
   return true;
 }
 
+function copyFile(src, dest) {
+  if (!fs.existsSync(src)) return false;
+  const dir = path.dirname(dest);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  fs.copyFileSync(src, dest);
+  return true;
+}
+
 function getRuleContent(isCognitive) {
   const cognitiveModeTitle = isCognitive ? 'COGNITIVE MODE' : 'STANDALONE MODE';
   const law5Text = isCognitive
     ? "5. **Law of Cognitive Closed-Loop:** Must query DSS before planning (`recall` mode 'dss'), and retain solutions to Second Brain (`retain` & `reflect`) after UAT."
-    : "5. **Law of Local Audit:** Record all architectural decisions and verified solutions to a local changelog or markdown report upon completion.";
+    : "5. **Law of Local Audit:** Record all architectural decisions, STRIDE threats, and verified solutions to local changelog/RFC.";
   const phase1DssText = isCognitive ? " (Query DSS for precedents)" : "";
   const phase8RetainText = isCognitive
     ? "Retain knowledge to Second Brain graph."
     : "Document verified outcome.";
 
   return `<!-- BEGIN FRIDAY-PROTOCOL (AUTO-INJECTED) -->
-# 🛡️ FRIDAY-PROTOCOL: PRIMARY GOVERNANCE LAW (${cognitiveModeTitle})
-All engineering tasks, feature additions, coding, refactors, and system modifications MUST 100% strictly adhere to this protocol:
+# 🛡️ FRIDAY-PROTOCOL v2.0: PRIMARY GOVERNANCE LAW (${cognitiveModeTitle})
+All engineering tasks, feature additions, coding, refactors, and system modifications MUST strictly adhere to this protocol:
 
 ## 1. THE 5 IRON LAWS
 1. **Law of Deliberation:** The AI is strictly FORBIDDEN from generating or modifying any code before an Implementation Plan is explicitly approved by the User.
-2. **Law of 6D Lifecycle Matrix:** Must map the entire feature journey across all 6 dimensions (*Source -> Runtime State -> Persistence -> Downstream Consumers -> Security/RBAC -> Failure Modes*).
-3. **Law of Security-First:** SAST and multi-role access control checks must pass BEFORE functional UAT to eliminate regression loops.
-4. **Law of Empirical Proof:** Never declare completion without objective proof (exit code 0, HTTP 200 OK, terminal logs).
+2. **Law of 6D Lifecycle Matrix & STRIDE:** Must map the entire feature journey across all 6 dimensions (*Source -> Runtime State -> Persistence -> Downstream Consumers -> Security/STRIDE -> Failure Modes*).
+3. **Law of Security-First (8 Pillars BSSN + UU PDP):** SAST (Auth, SQLi, DTOs, Uploads, Audit Trail, UU PDP/Blind Indexing, Throttling, RBAC) must pass BEFORE functional UAT.
+4. **Law of Empirical Proof:** Never declare completion without objective proof (exit code 0, HTTP 200 OK, test coverage >= 80%, terminal logs).
 ${law5Text}
 
 ## 2. HARD ANTI-BYPASS LOCK (ALWAYS-PROCEED PROOF)
@@ -51,11 +106,11 @@ Even if 'Always Proceed', auto-approval, or YOLO mode is enabled:
 - **Fast-Path (Q&A / Info / Status):** Answer directly, concisely, without plan bureaucracy.
 - **Execution-Path (Feature / Coding / Config / Fix):**
   1. *Phase 1 (Intent Analysis):* Analyze scope and requirements${phase1DssText}.
-  2. *Phase 2 (6D Lifecycle Planning):* Create Implementation Plan detailing all 6 dimensions.
+  2. *Phase 2 (6D Lifecycle Planning & STRIDE):* Create Implementation Plan detailing all 6 dimensions and STRIDE threat analysis.
   3. *Phase 3 (The Iron Gate):* ZERO TOOLS. Halt turn. Await User approval token.
   4. *Phase 4 (Blueprint Recap):* Summarize confirmed files and execution scope.
   5. *Phase 5 (Clean Implementation):* Write minimal, secure, surgical code.
-  6. *Phase 6 (SAST & Security Gate):* Audit OWASP Top 10, BFLA, channel isolation, and least privilege. Patch vulnerabilities immediately.
+  6. *Phase 6 (SAST & Security Gate):* Audit against the 8 Pillars of Secure Coding & UU PDP. Patch vulnerabilities immediately.
   7. *Phase 7 (Empirical UAT):* Verify full chain (Preview -> Save -> Downstream Export) + anti-regression + multi-role check. Gather terminal proof.
   8. *Phase 8 (Completion & Sign-off):* ${phase8RetainText} Present evidence-backed summary.
 <!-- END FRIDAY-PROTOCOL -->`;
@@ -87,31 +142,150 @@ function injectRuleFile(filePath, ruleSnippet) {
   }
 }
 
+function installRecipes(recipeType) {
+  const cwd = process.cwd();
+  const recipesDir = path.join(packageRoot, 'recipes');
+  const results = [];
+
+  if (recipeType === 'gitlab-ci' || recipeType === 'all') {
+    const src = path.join(recipesDir, 'ci', 'gitlab-ci-devsecops.yml');
+    const dest = path.join(cwd, '.gitlab-ci.yml');
+    if (copyFile(src, dest)) results.push({ name: 'GitLab CI DevSecOps Pipeline', dest });
+  }
+
+  if (recipeType === 'github-actions' || recipeType === 'all') {
+    const src = path.join(recipesDir, 'ci', 'github-actions-devsecops.yml');
+    const dest = path.join(cwd, '.github', 'workflows', 'devsecops.yml');
+    if (copyFile(src, dest)) results.push({ name: 'GitHub Actions DevSecOps Workflow', dest });
+  }
+
+  if (recipeType === 'pre-commit' || recipeType === 'all') {
+    const src = path.join(recipesDir, 'pre-commit', '.pre-commit-config.yaml');
+    const dest = path.join(cwd, '.pre-commit-config.yaml');
+    if (copyFile(src, dest)) results.push({ name: 'Git Pre-Commit Security Hooks', dest });
+  }
+
+  if (recipeType === 'dast' || recipeType === 'all') {
+    const srcSh = path.join(recipesDir, 'dast', 'run-zap-baseline.sh');
+    const srcPs1 = path.join(recipesDir, 'dast', 'run-zap-baseline.ps1');
+    const destSh = path.join(cwd, 'scripts', 'run-zap-baseline.sh');
+    const destPs1 = path.join(cwd, 'scripts', 'run-zap-baseline.ps1');
+    if (copyFile(srcSh, destSh)) results.push({ name: 'OWASP ZAP DAST Runner (Linux/macOS)', dest: destSh });
+    if (copyFile(srcPs1, destPs1)) results.push({ name: 'OWASP ZAP DAST Runner (Windows)', dest: destPs1 });
+  }
+
+  if (recipeType === 'docker-lab' || recipeType === 'all') {
+    const src = path.join(recipesDir, 'docker', 'compose-security-lab.yml');
+    const dest = path.join(cwd, 'compose-security-lab.yml');
+    if (copyFile(src, dest)) results.push({ name: 'Security Lab Docker Compose', dest });
+  }
+
+  return results;
+}
+
+async function performQuickUpdate() {
+  const userHome = os.homedir();
+  const ruleSnippet = getRuleContent(false);
+  const results = [];
+
+  const candidateRules = [
+    path.join(userHome, '.gemini', 'config', 'rules', 'GEMINI.md'),
+    path.join(userHome, '.claude', 'CLAUDE.md'),
+    path.join(userHome, '.cursorrules'),
+    path.join(process.cwd(), '.agents', 'rules', 'GEMINI.md'),
+    path.join(process.cwd(), 'CLAUDE.md'),
+    path.join(process.cwd(), '.cursorrules'),
+  ];
+
+  for (const r of candidateRules) {
+    if (fs.existsSync(r)) {
+      const res = injectRuleFile(r, ruleSnippet);
+      results.push(res);
+    }
+  }
+
+  const srcSkillsDir = path.join(packageRoot, 'skills', 'friday-protocol');
+  const candidateSkills = [
+    path.join(userHome, '.gemini', 'config', 'skills', 'friday-protocol'),
+    path.join(userHome, '.claude', 'skills', 'friday-protocol'),
+    path.join(userHome, '.cursor', 'skills', 'friday-protocol'),
+    path.join(process.cwd(), '.agents', 'skills', 'friday-protocol'),
+  ];
+
+  for (const s of candidateSkills) {
+    if (fs.existsSync(path.dirname(s))) {
+      copyDirectory(srcSkillsDir, s);
+      results.push({ status: 'skill', path: s });
+    }
+  }
+
+  return results;
+}
+
 async function main() {
   console.clear();
   p.intro(
-    pc.bgCyan(pc.black(' 🛡️  FRIDAY-PROTOCOL: Spec-Driven DevSecOps Governance '))
+    pc.bgCyan(pc.black(` 🛡️  FRIDAY-PROTOCOL v${currentVersion}: Spec-Driven DevSecOps Governance `))
   );
+
+  // Background check for update
+  const latestPromise = checkRemoteUpdate();
 
   const args = process.argv.slice(2);
   const isHelp = args.includes('--help') || args.includes('-h');
   const isYes = args.includes('--yes') || args.includes('-y');
+  const isUpdate = args.includes('--update') || args.includes('update');
+  const recipeIndex = args.findIndex((a) => a === '--recipe');
+  const recipeArg = recipeIndex !== -1 ? args[recipeIndex + 1] : null;
 
   if (isHelp) {
     console.log(`
-${pc.bold(pc.cyan('🛡️  FRIDAY-PROTOCOL CLI'))}
-Spec-Driven, DevSecOps-First Governance for Autonomous AI Agents
+${pc.bold(pc.cyan(`🛡️  FRIDAY-PROTOCOL CLI v${currentVersion}`))}
+BSSN-Aligned, Spec-Driven DevSecOps Governance for Autonomous AI Agents
 
 ${pc.bold('USAGE:')}
   npx friday-protocol [options]
 
 ${pc.bold('OPTIONS:')}
   -y, --yes          Run non-interactively with defaults (Universal, Global, Standalone)
+  --update           Update all existing installed governance rules and skills to v${currentVersion}
   --env <target>     Target environment: all, antigravity, claude, cursor (default: all)
   --scope <scope>    Installation scope: global, workspace (default: global)
   --cognitive        Enable Cognitive Second Brain Mode (default: false)
+  --recipe <type>    Deploy DevSecOps Recipes into current workspace:
+                     [gitlab-ci | github-actions | pre-commit | dast | docker-lab | all]
   -h, --help         Show this help message
 `);
+    process.exit(0);
+  }
+
+  // Handle in-place update
+  if (isUpdate) {
+    const s = p.spinner();
+    s.start(`Updating installed rules and skills to FRIDAY-PROTOCOL v${currentVersion}...`);
+    const updated = await performQuickUpdate();
+    s.stop(`Successfully updated ${updated.length} location(s)!`);
+
+    for (const item of updated) {
+      p.log.success(`${pc.green('[UPDATED]')} ${pc.dim(item.path)}`);
+    }
+
+    p.outro(pc.green(`🎉 FRIDAY-PROTOCOL updated to v${currentVersion} across your environments!`));
+    process.exit(0);
+  }
+
+  // Handle recipe deployment
+  if (recipeArg) {
+    const s = p.spinner();
+    s.start(`Deploying DevSecOps Recipe: ${pc.cyan(recipeArg)}...`);
+    const deployed = installRecipes(recipeArg);
+    s.stop(`Deployed ${deployed.length} DevSecOps recipe file(s)!`);
+
+    for (const item of deployed) {
+      p.log.success(`${pc.green('[RECIPE DEPLOYED]')} ${item.name} -> ${pc.dim(item.dest)}`);
+    }
+
+    p.outro(pc.green('🎉 DevSecOps Recipes ready! Commit these to your repository to activate automated security gates.'));
     process.exit(0);
   }
 
@@ -171,7 +345,7 @@ ${pc.bold('OPTIONS:')}
   }
 
   const s = p.spinner();
-  s.start(`Applying FRIDAY-PROTOCOL (${isCognitive ? 'Cognitive Mode' : 'Standalone DevSecOps Mode'})...`);
+  s.start(`Applying FRIDAY-PROTOCOL v${currentVersion} (${isCognitive ? 'Cognitive Mode' : 'Standalone DevSecOps Mode'})...`);
 
   const ruleSnippet = getRuleContent(isCognitive);
   const userHome = os.homedir();
@@ -239,7 +413,7 @@ ${pc.bold('OPTIONS:')}
     }
   }
 
-  // Optional: Copy templates to workspace if in workspace mode
+  // Copy templates to workspace if in workspace mode
   if (scope === 'workspace') {
     const destTemplates = path.join(process.cwd(), '.friday', 'templates');
     const copiedTpl = copyDirectory(srcTemplatesDir, destTemplates);
@@ -260,8 +434,14 @@ ${pc.bold('OPTIONS:')}
     p.log.success(`${icon} ${pc.dim(r.path)}`);
   }
 
+  // Check if a remote update exists and display notification
+  const latestVersion = await latestPromise;
+  if (latestVersion) {
+    showUpdateBox(currentVersion, latestVersion);
+  }
+
   p.outro(
-    pc.green('🎉 FRIDAY-PROTOCOL Activated! Your AI is now strictly governed by the 5 Iron Laws.')
+    pc.green(`🎉 FRIDAY-PROTOCOL v${currentVersion} Activated! Your AI is now strictly governed by the 5 Iron Laws & BSSN Security Standards.`)
   );
 }
 

@@ -1,20 +1,35 @@
 {
   "name": "friday-protocol",
-  "version": "1.1.1",
-  "description": "Spec-Driven, DevSecOps-First, and Anti-Hallucination Governance Protocol for Autonomous AI Agents",
+  "version": "2.0.0",
+  "description": "BSSN-Aligned, Spec-Driven DevSecOps & Anti-Hallucination Governance Framework for Autonomous AI Agents",
   "main": "./bin/cli.js",
   "bin": {
     "friday-protocol": "bin/cli.js"
   },
+  "files": [
+    "bin",
+    "core",
+    "skills",
+    "templates",
+    "recipes",
+    "assets",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
     "ai-agent",
     "governance",
+    "bssn",
+    "uu-pdp",
     "antigravity",
     "claude-code",
     "cursor",
     "windsurf",
     "devsecops",
     "spec-driven",
+    "stride",
+    "sast",
+    "dast",
     "clack",
     "cli"
   ],

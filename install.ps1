@@ -1,8 +1,8 @@
 <#
 .SYNOPSIS
-    FRIDAY-PROTOCOL Interactive Multi-Platform Installer (Windows PowerShell)
+    FRIDAY-PROTOCOL v2.0 Interactive Multi-Platform Installer (Windows PowerShell)
 .DESCRIPTION
-    Installs the FRIDAY-PROTOCOL governance rules and skills across Antigravity, Claude Code, and Cursor.
+    Installs the FRIDAY-PROTOCOL governance rules, skills, and DevSecOps recipes across Antigravity, Claude Code, and Cursor.
 #>
 
 $ErrorActionPreference = "Stop"
@@ -11,7 +11,7 @@ function Show-Banner {
     Write-Host ""
     Write-Host "==========================================================================" -ForegroundColor Cyan
     Write-Host "  🛡️  FRIDAY-PROTOCOL: Spec-Driven DevSecOps Governance for AI Agents" -ForegroundColor Green
-    Write-Host "  Version 1.0.0 | Open-Source Edition by Lucky Hermawan & FRIDAY" -ForegroundColor Yellow
+    Write-Host "  Version 2.0.0 | BSSN & OWASP DevSecOps Aligned Edition" -ForegroundColor Yellow
     Write-Host "==========================================================================" -ForegroundColor Cyan
     Write-Host ""
 }
@@ -40,10 +40,10 @@ Write-Host "  Do you have a Cognitive Second Brain (e.g. MemoriaGraph / MCP Memo
 $hasBrain = Read-Host "Enable Cognitive Mode? [y/N] (default: N)"
 $isCognitive = ($hasBrain -match "^[yY]")
 
-Write-Host "`n>>> Configuring FRIDAY-PROTOCOL ($($ifCognitive = if ($isCognitive) {'Cognitive Mode'} else {'Standalone DevSecOps Mode'} ; $ifCognitive))..." -ForegroundColor Cyan
+Write-Host "`n>>> Configuring FRIDAY-PROTOCOL v2.0 ($($ifCognitive = if ($isCognitive) {'Cognitive Mode'} else {'Standalone DevSecOps Mode'} ; $ifCognitive))..." -ForegroundColor Cyan
 
 $cognitiveModeTitle = if ($isCognitive) {'COGNITIVE MODE'} else {'STANDALONE MODE'}
-$law5Text = if ($isCognitive) { "5. **Law of Cognitive Closed-Loop:** Must query DSS before planning (`recall` mode 'dss'), and retain solutions to Second Brain (`retain` & `reflect`) after UAT." } else { "5. **Law of Local Audit:** Record all architectural decisions and verified solutions to a local changelog or markdown report upon completion." }
+$law5Text = if ($isCognitive) { "5. **Law of Cognitive Closed-Loop:** Must query DSS before planning (`recall` mode 'dss'), and retain solutions to Second Brain (`retain` & `reflect`) after UAT." } else { "5. **Law of Local Audit:** Record all architectural decisions, STRIDE threats, and verified solutions to local changelog/RFC." }
 $phase1DssText = if ($isCognitive) { " (Query DSS for precedents)" } else { "" }
 $phase8RetainText = if ($isCognitive) { "Retain knowledge to Second Brain graph." } else { "Document verified outcome." }
 
@@ -51,14 +51,14 @@ $phase8RetainText = if ($isCognitive) { "Retain knowledge to Second Brain graph.
 $ruleSnippet = @"
 
 <!-- BEGIN FRIDAY-PROTOCOL (AUTO-INJECTED) -->
-# 🛡️ FRIDAY-PROTOCOL: PRIMARY GOVERNANCE LAW ($cognitiveModeTitle)
-All engineering tasks, feature additions, coding, refactors, and system modifications MUST 100% strictly adhere to this protocol:
+# 🛡️ FRIDAY-PROTOCOL v2.0: PRIMARY GOVERNANCE LAW ($cognitiveModeTitle)
+All engineering tasks, feature additions, coding, refactors, and system modifications MUST strictly adhere to this protocol:
 
 ## 1. THE 5 IRON LAWS
 1. **Law of Deliberation:** The AI is strictly FORBIDDEN from generating or modifying any code before an Implementation Plan is explicitly approved by the User.
-2. **Law of 6D Lifecycle Matrix:** Must map the entire feature journey across all 6 dimensions (*Source -> Runtime State -> Persistence -> Downstream Consumers -> Security/RBAC -> Failure Modes*).
-3. **Law of Security-First:** SAST and multi-role access control checks must pass BEFORE functional UAT to eliminate regression loops.
-4. **Law of Empirical Proof:** Never declare completion without objective proof (exit code 0, HTTP 200 OK, terminal logs).
+2. **Law of 6D Lifecycle Matrix & STRIDE:** Must map the entire feature journey across all 6 dimensions (*Source -> Runtime State -> Persistence -> Downstream Consumers -> Security/STRIDE -> Failure Modes*).
+3. **Law of Security-First (8 Pillars BSSN + UU PDP):** SAST (Auth, SQLi, DTOs, Uploads, Audit Trail, UU PDP/Blind Indexing, Throttling, RBAC) must pass BEFORE functional UAT.
+4. **Law of Empirical Proof:** Never declare completion without objective proof (exit code 0, HTTP 200 OK, test coverage >= 80%, terminal logs).
 $law5Text
 
 ## 2. HARD ANTI-BYPASS LOCK (ALWAYS-PROCEED PROOF)
@@ -71,11 +71,11 @@ Even if 'Always Proceed', auto-approval, or YOLO mode is enabled:
 - **Fast-Path (Q&A / Info / Status):** Answer directly, concisely, without plan bureaucracy.
 - **Execution-Path (Feature / Coding / Config / Fix):**
   1. *Phase 1 (Intent Analysis):* Analyze scope and requirements$phase1DssText.
-  2. *Phase 2 (6D Lifecycle Planning):* Create Implementation Plan detailing all 6 dimensions.
+  2. *Phase 2 (6D Lifecycle Planning & STRIDE):* Create Implementation Plan detailing all 6 dimensions and STRIDE threat analysis.
   3. *Phase 3 (The Iron Gate):* ZERO TOOLS. Halt turn. Await User approval token.
   4. *Phase 4 (Blueprint Recap):* Summarize confirmed files and execution scope.
   5. *Phase 5 (Clean Implementation):* Write minimal, secure, surgical code.
-  6. *Phase 6 (SAST & Security Gate):* Audit OWASP Top 10, BFLA, channel isolation, and least privilege. Patch vulnerabilities immediately.
+  6. *Phase 6 (SAST & Security Gate):* Audit against the 8 Pillars of Secure Coding & UU PDP. Patch vulnerabilities immediately.
   7. *Phase 7 (Empirical UAT):* Verify full chain (Preview -> Save -> Downstream Export) + anti-regression + multi-role check. Gather terminal proof.
   8. *Phase 8 (Completion & Sign-off):* $phase8RetainText Present evidence-backed summary.
 <!-- END FRIDAY-PROTOCOL -->
@@ -124,12 +124,15 @@ function Install-SkillFiles {
             Invoke-WebRequest -Uri "$baseUri/references/6d-matrix.md" -OutFile (Join-Path $refDir "6d-matrix.md") -UseBasicParsing | Out-Null
             Invoke-WebRequest -Uri "$baseUri/references/sast-checklist.md" -OutFile (Join-Path $refDir "sast-checklist.md") -UseBasicParsing | Out-Null
             Invoke-WebRequest -Uri "$baseUri/references/dss-integration.md" -OutFile (Join-Path $refDir "dss-integration.md") -UseBasicParsing | Out-Null
+            Invoke-WebRequest -Uri "$baseUri/references/devsecops-pipeline.md" -OutFile (Join-Path $refDir "devsecops-pipeline.md") -UseBasicParsing | Out-Null
             Write-Host "  [SKILL DOWNLOADED & INSTALLED] $DestDir" -ForegroundColor Cyan
         } catch {
             Write-Host "  [WARN] Failed to download skill files: $_" -ForegroundColor Yellow
         }
     }
 }
+
+$userHome = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::UserProfile)
 
 # Targets Mapping
 if ($envChoice -in @("1", "4")) {
@@ -155,8 +158,8 @@ if ($envChoice -in @("3", "4")) {
 
 Write-Host ""
 Write-Host "==========================================================================" -ForegroundColor Green
-Write-Host "  🎉 FRIDAY-PROTOCOL Successfully Installed!" -ForegroundColor Green
-Write-Host "  Your AI agent is now governed by the 5 Iron Laws & The Iron Gate." -ForegroundColor Yellow
+Write-Host "  🎉 FRIDAY-PROTOCOL v2.0 Successfully Installed!" -ForegroundColor Green
+Write-Host "  Your AI agent is now governed by the 5 Iron Laws & BSSN Security Standards." -ForegroundColor Yellow
 Write-Host "  Next time your agent runs, it will pause for your plan approval!" -ForegroundColor Cyan
 Write-Host "==========================================================================" -ForegroundColor Green
 Write-Host ""

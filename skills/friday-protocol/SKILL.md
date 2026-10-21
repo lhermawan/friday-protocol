@@ -1,30 +1,33 @@
 ---
 name: friday-protocol
 description: >-
-  The official FRIDAY-PROTOCOL (Cognitive & Spec-Driven DevSecOps). Use whenever designing,
-  coding, upgrading features, refactoring, or modifying system configurations to enforce
-  the 5 Iron Laws, 6D Lifecycle Matrix, SAST security gate, and empirical UAT verification.
+  The official FRIDAY-PROTOCOL v2.0 (BSSN-Aligned Cognitive DevSecOps & Anti-Hallucination Framework).
+  Use whenever designing, coding, upgrading features, refactoring, or modifying system configurations
+  to enforce the 5 Iron Laws, 6D Lifecycle Matrix + STRIDE Threat Modeling, 8-Pillars SAST/UU PDP gate,
+  and empirical UAT verification.
 ---
 
-# 🛡️ FRIDAY-PROTOCOL: Cognitive DevSecOps & Anti-Hallucination Execution
+# 🛡️ FRIDAY-PROTOCOL v2.0: Cognitive DevSecOps & Secure SDLC Governance
 
 FRIDAY-PROTOCOL transforms AI agents from reckless code-generators into disciplined Staff Engineers.
-It prevents ping-pong bugs, enforces full data lifecycle tracing, eliminates broken access control (BFLA/BAC),
+It aligns automated software development with **BSSN RI Secure Application Guidelines**, **OWASP API Top 10**, and **UU No. 27/2022 Pelindungan Data Pribadi (UU PDP)**.
+
+It prevents ping-pong bugs, enforces full data lifecycle tracing, eliminates broken access control (BFLA/BOLA),
 and stops unauthorized auto-execution via Zero-Tool Turn Termination.
 
 ---
 
-## The 5 Iron Laws
+## 🏛️ The 5 Iron Laws
 
 1. **Law of Deliberation:** No code without an explicitly approved Implementation Plan from the Operator.
-2. **Law of 6D Lifecycle Matrix:** Must map the entire feature journey across all 6 dimensions before coding.
-3. **Law of Security-First:** SAST and Multi-Role checks must pass BEFORE functional testing to eliminate regression loops.
-4. **Law of Empirical Proof:** Never declare completion without objective proof (exit code 0, 200 OK, terminal logs).
+2. **Law of 6D Lifecycle Matrix:** Must map the entire feature journey across all 6 dimensions + STRIDE Threat Modeling before coding.
+3. **Law of Security-First:** SAST (8 Pillars BSSN + UU PDP) and Multi-Role checks must pass BEFORE functional testing to eliminate regression loops.
+4. **Law of Empirical Proof:** Never declare completion without objective proof (exit code 0, 200 OK, test coverage, terminal logs).
 5. **Law of Cognitive Closed-Loop:** Consult DSS before planning; retain solutions in Second Brain upon completion.
 
 ---
 
-## 8-Phase Execution Workflow
+## 🔄 8-Phase Execution Workflow
 
 ### Phase 1: Ingestion & Intent Analysis
 - Parse the user's intent, constraints, and dependencies.
@@ -33,15 +36,17 @@ and stops unauthorized auto-execution via Zero-Tool Turn Termination.
   - Retrieve heuristics: `reflect(action='reflect', question='<topic>')`
   - Identify past pitfalls, architecture precedents, and verified patterns.
 
-### Phase 2: 6D Lifecycle Planning
-Create an Implementation Plan Artifact with `RequestFeedback: true`.
+### Phase 2: 6D Lifecycle Planning & Threat Modeling
+Create an Implementation Plan Artifact with `RequestFeedback: true` using [plan-template.md](../../templates/plan-template.md).
 The plan MUST detail the [Universal 6D Lifecycle Matrix](./references/6d-matrix.md):
-1. **Source / Input:** Entry point, payload validation, formats, size bounds.
-2. **Runtime State:** In-memory state, reactivity, UI components, local variables.
-3. **Persistence:** Database records, disk files, config sync, cold-restart survival.
-4. **Downstream Consumers:** PDF engines, background workers, export jobs, satellite apps.
-5. **Security & RBAC:** Multi-role barriers, admin channel isolation, least privilege.
-6. **Failure & Edge-Cases:** Network drop, timeouts, invalid tokens, fallback behavior.
+1. **Source / Input:** Entry points, Zod/FormRequest schemas, upload MIME & magic bytes checks, honeypot traps.
+2. **Runtime State:** In-memory state, reactivity, unmount cleanup, short-lived tokens (5–15 min).
+3. **Persistence & Storage:** DB schemas, PII encryption at rest (**AES-256-CBC**), blind indexing (`*_hash`), immutable audit logging (`audit_logs`), cold restart test.
+4. **Downstream Consumers:** PDF compilation engines, background queue workers, satellite SSO apps, room-scoped WebSockets (`io.to()`).
+5. **Security & STRIDE:** Map **STRIDE** (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege) to technical mitigations.
+6. **Failure & Edge-Cases:** Graceful HTTP 429 throttling, DB transaction rollbacks (`DB::transaction`), and rollback plans.
+
+*(Note: For production server modifications or infrastructure changes, use the [RFC Template](../../templates/rfc-template.md)).*
 
 ### Phase 3: The Iron Gate (Hard Anti-Bypass Lock)
 - **CRITICAL:** Call NO MORE TOOLS. End the turn immediately.
@@ -52,29 +57,34 @@ The plan MUST detail the [Universal 6D Lifecycle Matrix](./references/6d-matrix.
 - Any code generation prior to receiving this manual human token is an existential protocol violation.
 
 ### Phase 4: Blueprint Recap
-- Summarize confirmed scope and target files.
+- Summarize confirmed scope, architectural dimensions, and target files before touching code.
 
 ### Phase 5: Clean Implementation
-- Write minimal, elegant code strictly addressing the approved spec.
+- Write minimal, surgical code strictly addressing the approved spec.
 - No unsolicited scope expansion or premature abstractions.
+- Adhere to single-responsibility endpoints and DTO strictness.
 
-### Phase 6: SAST & Security Hardening
+### Phase 6: SAST & Security Hardening (8 Pillars BSSN)
 - Audit code against [SAST Checklist](./references/sast-checklist.md):
-  - OWASP Top 10 (Injection, Broken Access Control, Secrets).
-  - BFLA / Broken Function Level Authorization.
-  - Channel over-broadcasting (`io.emit()` vs `io.to(room).emit()`).
-  - Server-side role enforcement (not just client CSS `v-if`).
+  1. *Authentication:* Short TTL JWT (5–15 min) + HttpOnly cookies + Revocation list.
+  2. *SQL Injection:* Parameterized queries / ORM queries only.
+  3. *Mass Assignment:* Explicit `$fillable` / strict DTOs.
+  4. *Upload Defense:* MIME + Extension + Magic Bytes + UUID rename + Private storage.
+  5. *Non-Repudiation:* Immutable `audit_logs` (actor, time, IP, action, delta).
+  6. *UU PDP:* AES-256-CBC encryption + blind indexing (`nik_hash`) + PII masking in UI/API.
+  7. *DoS Defense:* Rate limiting middleware (5 req/min) + invisible honeypots.
+  8. *Access Control:* Server-side Gate/Policy enforcement (BFLA/BOLA) + room-scoped broadcasts.
 - Patch all vulnerabilities immediately before proceeding.
 
 ### Phase 7: Full-Chain UAT & Anti-Regression
-- Execute end-to-end tests across the entire chain:
-  - [x] Input validation test.
-  - [x] Live state & reactivity test.
+- Execute end-to-end tests across the entire chain and document in [uat-checklist.md](../../templates/uat-checklist.md):
+  - [x] Input schema validation & reactive UI update.
   - [x] Persistence & cold reload test (ensure no default fallback).
   - [x] Downstream export test (verify PDF/worker receives custom data).
   - [x] Multi-Role test (verify regular user cannot access/receive admin alerts).
+  - [x] PII data protection test (verify encrypted at rest & masked in response).
   - [x] Regression check on previously working features.
-- Collect hard empirical evidence (terminal logs, HTTP status).
+- Collect hard empirical evidence (terminal logs, HTTP status, scan results).
 
 ### Phase 8: Cognitive Retention & Sign-off
 - If Cognitive Mode enabled:

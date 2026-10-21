@@ -1,0 +1,46 @@
+# ==============================================================================
+# 🛡️ FRIDAY-PROTOCOL: Local DevSecOps & Vulnerability Lab Environment
+# Reference: BSSN Day 3 & Day 4 Practical Lab Setup
+# ==============================================================================
+# Usage:
+#   docker compose -f compose-security-lab.yml up -d
+# ==============================================================================
+
+version: '3.8'
+
+networks:
+  pentest-net:
+    name: friday-security-net
+    driver: bridge
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+
+services:
+  # 1. Target Vulnerable Web Application (DVWA) for Testing
+  dvwa-target:
+    image: vulnerables/web-dvwa:latest
+    container_name: friday-dvwa-target
+    ports:
+      - "9999:80"
+    networks:
+      - pentest-net
+    restart: unless-stopped
+
+  # 2. SonarQube Community Edition (SAST & Quality Gate)
+  sonarqube:
+    image: sonarqube:community
+    container_name: friday-sonarqube
+    ports:
+      - "9000:9000"
+    networks:
+      - pentest-net
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    restart: unless-stopped

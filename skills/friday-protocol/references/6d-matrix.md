@@ -1,42 +1,64 @@
-# 📊 Universal 6D Lifecycle Matrix Guide
+# 📊 Universal 6D Lifecycle Matrix & Threat Modeling Guide
 
-The **Universal 6D Lifecycle Matrix** forces AI agents to examine the complete end-to-end journey of a feature before generating any code. This directly eliminates the "Ping-Pong QA" trap where fixing one layer breaks downstream consumers.
+> **Standard:** FRIDAY-PROTOCOL v2.0.0  
+> **Mandate:** The **Universal 6D Lifecycle Matrix** forces AI agents and engineers to examine the complete end-to-end journey of every feature before writing any code.  
+> **Integration:** Combines Full Data-Flow Tracing with **STRIDE Threat Modeling (NIST SP 800-160/154)** and CIA Triad mapping to eradicate "Ping-Pong QA" and architectural oversights.
 
 ---
 
-## The 6 Mandatory Dimensions
+## 🏛️ The 6 Mandatory Dimensions
 
-Every Implementation Plan MUST address each dimension:
+Every Implementation Plan MUST address each dimension in concrete detail:
 
-### 1. Source & Ingestion Dimension
-- Where does the data/event originate?
-- Form inputs, REST API payload, GraphQL, Webhook, WebSocket, CLI flag, file upload.
-- **Verification Rule:** Validate MIME type, payload size bounds, data schemas (Zod / Pydantic / TypeScript types), sanitize inputs.
+### 1. Source & Ingestion Dimension (The Entry Point)
+- **Origination:** Form inputs, REST API payload, GraphQL, Webhook, WebSocket, CLI flag, file upload.
+- **Verification & Defense Rules:**
+  - Strict input schemas (Zod, Pydantic, FormRequest) with type coercion and size limits.
+  - Granular single-responsibility API routes (prevent "fat update" endpoints).
+  - Multi-layer upload validation (MIME whitelist, extension, magic bytes header, UUID/hash file renaming).
+  - Anti-bot traps: Hidden honeypot fields on public endpoints.
 
-### 2. Runtime & Reactive State Dimension
-- How is the state held in memory during execution?
-- React/Vue reactive state, Redux/Zustand store, server-side process memory, thread pools.
-- **Verification Rule:** Does the UI update reactively without requiring an explicit browser reload? Does state clean up on unmount (prevent memory leaks)?
+### 2. Runtime & Reactive State Dimension (In-Memory Processing)
+- **Lifecycle:** Memory footprint in React/Vue stores (Pinia, Redux, Zustand), backend process memory, worker threads.
+- **Verification & Defense Rules:**
+  - Token memory hygiene: Store short-lived access tokens (5–15 min) in memory or secure context; NEVER store long-term secrets in `localStorage`.
+  - Reactive sync: UI must update reactively without requiring manual reloads.
+  - Lifecycle cleanup: Unsubscribe event listeners, WebSocket rooms, and worker polling on component unmount to prevent memory leaks and zombie connections.
 
-### 3. Storage & Persistence Dimension
-- Where does data persist permanently?
-- PostgreSQL, MySQL, Redis, SQLite, disk files, browser LocalStorage/IndexedDB.
-- **Verification Rule:** Perform a "Cold Restart Test": Hard-refresh the page (Ctrl+F5) or restart the backend process. Does the state remain intact, or does it silently fallback to defaults?
+### 3. Storage & Persistence Dimension (The Source of Truth)
+- **Persistence Target:** PostgreSQL, MySQL, Redis, SQLite, disk files, S3 buckets.
+- **Verification & Defense Rules:**
+  - **Cold Restart Test:** Hard-refresh (Ctrl+F5) or reboot the backend service. Data must survive and not silently revert to factory defaults.
+  - **UU PDP (PII Protection):** Sensitive data (NIK, financial details, passwords) MUST be encrypted at rest using authenticated **AES-256-CBC/GCM**.
+  - **Blind Indexing:** Implement indexed hash columns (`nik_hash = HMAC(nik, secret)`) for instant searchability without plaintext exposure.
+  - **Audit Non-Repudiation:** Record actor ID, action enum, target resource, timestamp, and IP into immutable audit tables. Foreign keys for security logs must use `ON DELETE SET NULL`.
 
-### 4. Downstream & Consumer Pipeline Dimension
-- What secondary systems rely on this data?
-- PDF generation engines (Puppeteer / wkhtmltopdf / WeasyPrint).
-- Background workers, queue jobs (BullMQ / Celery), analytics pipelines, third-party webhooks.
-- Satellite apps (e.g., SSO consumers like Raidpass relying on Maskii Studio).
-- **Verification Rule:** If a custom font or user setting is saved, confirm that the exported PDF or worker output embeds that exact setting rather than defaulting.
+### 4. Downstream & Consumer Pipeline Dimension (The Ripple Effect)
+- **Dependent Subsystems:**
+  - Document & PDF compilation engines (Puppeteer, Playwright, wkhtmltopdf).
+  - Background workers, queue jobs (BullMQ, Celery, Laravel Queue).
+  - Satellite platforms (e.g., Single Sign-On consumers, webhook subscribers, analytics reporting).
+- **Verification & Defense Rules:**
+  - Confirm that modifications to state flow cleanly into exported PDFs, notifications, and satellite systems.
+  - Async queue isolation: Heavy computational tasks (file compression, mass mailing) must run asynchronously to protect API response latency.
 
-### 5. Security & Isolation Dimension
-- Who is authorized to interact with or observe this feature?
-- Role-Based Access Control (RBAC), multi-tenancy boundaries, token verification.
-- **Channel Isolation:** Never broadcast private alerts globally (e.g., avoid `io.emit()` for admin notifications; use isolated rooms `io.to('admin').emit()`).
-- **Server Enforcement:** Never rely on UI hiding (`v-if="isAdmin"`). Always guard the backend route/middleware.
+### 5. Security, RBAC & STRIDE Threat Modeling Dimension
+- **Adversarial Thinking (NIST SP 800-160):** Think like an attacker before implementing.
+- **The STRIDE vs CIA Triad Matrix:**
 
-### 6. Failure Modes & Edge-Cases Dimension
-- What happens when things go wrong?
-- Network disconnects, database timeouts, corrupted files, token expiration, race conditions.
-- **Verification Rule:** Provide graceful user feedback, automated retry with backoff, offline indicators, and transaction rollbacks.
+| STRIDE Threat Category | Violates Security Goal | Target Defense Checklist |
+| :--- | :--- | :--- |
+| **S** - **Spoofing** (Impersonating someone else) | **Authentication** | HttpOnly cookies, signature verification, multi-factor auth, session drift verification. |
+| **T** - **Tampering** (Modifying data in transit/rest) | **Integrity** | Parameterized queries (anti-SQLi), DTO payload whitelisting, cryptographic payload signing. |
+| **R** - **Repudiation** (Denying an action was taken) | **Non-Repudiation** | Immutable append-only audit trail logging (Actor, Time, IP, Action, Before-After delta). |
+| **I** - **Information Disclosure** (Data leaks) | **Confidentiality** | PII field masking in UI/API, private storage buckets, signed URLs, zero-leak exception handlers. |
+| **D** - **Denial of Service** (Crashing or exhausting system) | **Availability** | Rate limiting / route throttling (5 req/min), anti-bot honeypots, submit button disabling, async queues. |
+| **E** - **Elevation of Privilege** (Unauthorized privileges) | **Authorization** | Strict server-side Gates & Policies (BFLA/BOLA checks), isolated admin routes, channel scoping (`io.to()`). |
+
+### 6. Failure Modes & Edge-Cases Dimension (Resilience Under Fire)
+- **Failure Scenarios:** Database timeouts, third-party API downtime, network disconnects, token expiration during checkout/form submission, concurrent race conditions.
+- **Verification & Defense Rules:**
+  - Database transactions (`DB::transaction`) to ensure atomic multi-table operations with automatic rollback.
+  - Graceful HTTP 429 (Too Many Requests) handling with user-friendly retry banners.
+  - Real-time exception capture via Sentry / central telemetry with PII scrubbed out.
+  - Explicit rollback plan documented for every production release.
