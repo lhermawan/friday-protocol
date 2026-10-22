@@ -80,42 +80,116 @@ Even when `--dangerously-skip-permissions`, YOLO mode, or `Always Proceed` is ac
 
 ---
 
-## 🚀 Quick Start (Zero-Install CLI)
+## 🚀 Panduan Penggunaan & Tutorial Lengkap (CLI Guide)
 
-### 1. Activate AI Agent Governance
-Run directly via `npx` (no pre-cloning required):
+FRIDAY-PROTOCOL CLI dapat dijalankan secara instan tanpa perlu clone manual menggunakan `npx friday-protocol`.
+
+### 💡 Apakah Perlu Menentukan Path Proyek?
+> [!NOTE]
+> **Tidak perlu!** Jika terminal Anda sudah berada di dalam direktori proyek (`cd /path/ke/proyek`), perintah akan **secara otomatis menargetkan direktori kerja aktif (Current Working Directory)** saat ini.
+> Anda hanya perlu menyertakan path jika ingin mengeksekusi dari luar folder proyek (misalnya: `npx friday-protocol --audit ./apps/backend`).
+
+---
+
+### 1. Inisialisasi Tata Kelola AI di Proyek Aktif (`workspace`)
+Untuk mengikat AI Coding Assistant (Google Antigravity, Anthropic Claude Code, Cursor, Windsurf) agar tunduk pada 5 Iron Laws & BSSN Security Standards di proyek spesifik:
 
 ```bash
+# 1. Buka folder proyek Anda di terminal
+cd /path/ke/proyek-anda
+
+# 2. Jalankan installer dengan mode workspace (otomatis di folder aktif)
+npx friday-protocol --scope workspace -y
+
+# Atau gunakan mode interaktif:
 npx friday-protocol
+# (Pilih: Target Environment -> Scope: Workspace / Local Project -> Standalone/Cognitive)
 ```
 
-Flags for automated / CI setup:
+**File yang dihasilkan di folder proyek:**
+- `.agents/rules/GEMINI.md` (untuk Google Antigravity & AI Agent Swarms)
+- `CLAUDE.md` (untuk Anthropic Claude Code)
+- `.cursorrules` (untuk Cursor & Windsurf)
+- `.agents/skills/friday-protocol/` (SOP lengkap & katalog referensi keamanan)
+
+---
+
+### 2. Menjalankan Adversarial Security Audit Suite (`--audit`)
+Untuk menyiapkan audit keamanan adversarial berbasis standar Cloudflare:
+
 ```bash
-# Universal global setup for Antigravity, Claude, and Cursor
+# Jalankan langsung di folder proyek Anda (tanpa perlu menyertakan path):
+npx friday-protocol --audit
+
+# Atau targetkan folder proyek lain dari mana saja:
+npx friday-protocol --audit ./nama-folder-proyek
+```
+
+**Apa yang disiapkan oleh perintah ini?**
+Perintah ini akan membuat struktur folder audit mandiri di `.friday/audit/`:
+```text
+.friday/audit/
+├── report-schema.json          # Schema JSON validasi standar Cloudflare & BSSN
+├── findings.json               # Tempat agen mencatat temuan (confirmed, needs_validation, rejected)
+└── validate-findings.cjs       # Runner validasi mandiri tanpa dependensi pihak ketiga (Zero-Dependency)
+```
+
+**Alur Kerja Audit Keamanan:**
+1. Instruksikan AI Agent Anda di chat:
+   > *"Audit repositori ini menggunakan FRIDAY-PROTOCOL Adversarial Security Audit. Terapkan arsitektur Hunter vs Verifier. Catat temuan ke `.friday/audit/findings.json`."*
+2. **Hunter Agent** memindai potensi celah berdasarkan katalog ancaman:
+   - `skills/friday-protocol/references/threats-ai-and-llm.md`
+   - `skills/friday-protocol/references/threats-data-lifecycle.md`
+   - `skills/friday-protocol/references/threats-desktop-ipc.md`
+3. **Disprover Agent (Verifier terpisah)** wajib menguji refutasi terhadap setiap temuan kandidat sebelum dinyatakan `confirmed`. Temuan yang tidak memiliki bukti exploit lokal atau mitigasi yang terbukti valid akan dinyatakan `rejected` atau `needs_validation`.
+4. **Validasi Hasil Audit:**
+   ```bash
+   node .friday/audit/validate-findings.cjs .friday/audit/findings.json
+   ```
+
+---
+
+### 3. Deploy Resep DevSecOps Turnkey CI/CD (`--recipe`)
+Pasang pipeline otomasi keamanan industri langsung ke repo proyek Anda dalam 1 detik:
+
+```bash
+# Masuk ke folder proyek Anda, lalu pilih resep:
+npx friday-protocol --recipe github-actions   # .github/workflows/devsecops.yml (Trivy + Gitleaks)
+npx friday-protocol --recipe gitlab-ci         # .gitlab-ci.yml (Trivy + Gitleaks)
+npx friday-protocol --recipe pre-commit       # .pre-commit-config.yaml (Local Secret Scanning)
+npx friday-protocol --recipe dast             # scripts/run-zap-baseline.ps1 & .sh (OWASP ZAP)
+npx friday-protocol --recipe docker-lab       # compose-security-lab.yml (SonarQube & DVWA)
+npx friday-protocol --recipe all              # Pasang seluruh resep sekaligus
+```
+
+---
+
+### 4. CLI Reference & Panduan Bantuan (`--help`)
+Untuk melihat seluruh daftar flag dan contoh penggunaan langsung di terminal:
+
+```bash
+npx friday-protocol --help
+```
+
+| Opsi / Flag | Keterangan & Perilaku | Nilai Default |
+| :--- | :--- | :--- |
+| `-y, --yes` | Menjalankan non-interaktif tanpa wizard prompt | `false` |
+| `--audit [path]` | Scaffold audit suite ke direktori target | Otomatis folder saat ini (`cwd`) jika `[path]` tidak diisi |
+| `--scope <scope>` | Cakupan instalasi: `global` (seluruh sistem) atau `workspace` (hanya folder proyek ini) | `global` (jika `-y`) |
+| `--env <target>` | Target lingkungan: `all`, `antigravity`, `claude`, `cursor` | `all` |
+| `--recipe <type>` | Deploy template DevSecOps: `github-actions`, `gitlab-ci`, `pre-commit`, `dast`, `docker-lab`, `all` | - |
+| `--cognitive` | Mengaktifkan integrasi MemoriaGraph / DSS Second Brain | `false` (Standalone) |
+| `--update` | Memperbarui seluruh rule dan skill yang sudah terpasang ke versi terbaru | - |
+| `-h, --help` | Menampilkan panduan bantuan & contoh perintah | - |
+
+---
+
+### 5. Setup Global (Sekali untuk Semua Proyek)
+Jika ingin seluruh AI Agent di komputer Anda langsung terikat FRIDAY-PROTOCOL tanpa perlu setup per-folder:
+
+```bash
+# Instalasi global otomatis
 npx friday-protocol -y
-
-# Specific agent environment & workspace scope
-npx friday-protocol --env antigravity --scope workspace -y
-```
-
-### 2. Deploy Turnkey DevSecOps CI/CD Recipes
-You can scaffold production-grade DevSecOps pipelines into any existing project repository with one command:
-
-```bash
-# Deploy GitLab CI DevSecOps Pipeline (.gitlab-ci.yml)
-npx friday-protocol --recipe gitlab-ci
-
-# Deploy GitHub Actions DevSecOps Workflow (.github/workflows/devsecops.yml)
-npx friday-protocol --recipe github-actions
-
-# Deploy Git Pre-Commit Security Hooks (.pre-commit-config.yaml with Gitleaks)
-npx friday-protocol --recipe pre-commit
-
-# Deploy OWASP ZAP Baseline DAST Runner scripts (scripts/run-zap-baseline.ps1 & .sh)
-npx friday-protocol --recipe dast
-
-# Deploy everything at once
-npx friday-protocol --recipe all
 ```
 
 ---
@@ -168,7 +242,7 @@ All code modified under FRIDAY-PROTOCOL must satisfy the 8 security pillars in [
 friday-protocol/
 ├── README.md                                  # Comprehensive Guide & Documentation
 ├── LICENSE                                    # MIT License
-├── package.json                               # npm package manifest (v2.2.0)
+├── package.json                               # npm package manifest (v2.2.1)
 ├── bin/
 │   ├── cli.js                                 # Interactive CLI with recipe deployment & audit runner
 │   └── validate-findings.cjs                  # Zero-dependency finding schema & reconciliation validator

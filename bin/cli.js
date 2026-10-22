@@ -264,6 +264,7 @@ ${pc.bold('USAGE:')}
 ${pc.bold('OPTIONS:')}
   -y, --yes          Run non-interactively with defaults (Universal, Global, Standalone)
   --audit [path]     Scaffold Adversarial Security Audit suite into target repository
+                     (Defaults to current directory if [path] is omitted)
   --update           Update all existing installed governance rules and skills to v${currentVersion}
   --env <target>     Target environment: all, antigravity, claude, cursor (default: all)
   --scope <scope>    Installation scope: global, workspace (default: global)
@@ -271,6 +272,22 @@ ${pc.bold('OPTIONS:')}
   --recipe <type>    Deploy DevSecOps Recipes into current workspace:
                      [gitlab-ci | github-actions | pre-commit | dast | docker-lab | all]
   -h, --help         Show this help message
+
+${pc.bold('EXAMPLES:')}
+  ${pc.dim('# 1. In Project Folder (No path needed - automatically targets current folder):')}
+  cd /path/to/my-project
+  npx friday-protocol --audit
+  npx friday-protocol --scope workspace -y
+  npx friday-protocol --recipe github-actions
+
+  ${pc.dim('# 2. Target another project folder via explicit path:')}
+  npx friday-protocol --audit ./another-project
+
+  ${pc.dim('# 3. Universal Global Installation for all AI coding agents:')}
+  npx friday-protocol -y
+
+  ${pc.dim('# 4. Validate audit findings report inside project:')}
+  node .friday/audit/validate-findings.cjs .friday/audit/findings.json
 `);
     process.exit(0);
   }
@@ -288,6 +305,10 @@ ${pc.bold('OPTIONS:')}
     const schemaSrc = path.join(packageRoot, 'core', 'schemas', 'report-schema.json');
     const schemaDest = path.join(auditDir, 'report-schema.json');
     copyFile(schemaSrc, schemaDest);
+
+    const validatorSrc = path.join(packageRoot, 'bin', 'validate-findings.cjs');
+    const validatorDest = path.join(auditDir, 'validate-findings.cjs');
+    copyFile(validatorSrc, validatorDest);
 
     const findingsFile = path.join(auditDir, 'findings.json');
     if (!fs.existsSync(findingsFile)) {
@@ -308,6 +329,9 @@ ${pc.bold('OPTIONS:')}
 
     s.stop('Security Audit Suite scaffolded successfully!');
 
+    const relValidator = path.relative(process.cwd(), validatorDest) || '.friday/audit/validate-findings.cjs';
+    const relFindings = path.relative(process.cwd(), findingsFile) || '.friday/audit/findings.json';
+
     console.log(`
 ${pc.bold(pc.green('🛡️  FRIDAY-PROTOCOL: Adversarial Security Audit Mode Activated'))}
 ${pc.dim('Adversarial Rule: The agent who hunts a finding must never validate it.')}
@@ -315,14 +339,15 @@ ${pc.dim('Adversarial Rule: The agent who hunts a finding must never validate it
 ${pc.bold('Audit Workspace:')} ${pc.cyan(auditDir)}
   - Schema:    ${pc.dim(schemaDest)}
   - Findings:  ${pc.dim(findingsFile)}
+  - Validator: ${pc.dim(validatorDest)}
 
 ${pc.bold('Threat Catalogs Available:')}
   - AI & LLM:       ${pc.magenta('skills/friday-protocol/references/threats-ai-and-llm.md')}
   - Data Lifecycle: ${pc.magenta('skills/friday-protocol/references/threats-data-lifecycle.md')}
   - Desktop & IPC:  ${pc.magenta('skills/friday-protocol/references/threats-desktop-ipc.md')}
 
-${pc.bold('Validation Command:')}
-  ${pc.cyan(`node ${path.relative(process.cwd(), path.join(packageRoot, 'bin', 'validate-findings.cjs'))} ${path.relative(process.cwd(), findingsFile)}`)}
+${pc.bold('Validation Command (In-Project):')}
+  ${pc.cyan(`node ${relValidator} ${relFindings}`)}
 `);
 
     p.outro(pc.green('🚀 Ready for hunting! Instruct your AI: "Audit this codebase using FRIDAY-PROTOCOL"'));
