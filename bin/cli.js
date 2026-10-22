@@ -86,12 +86,12 @@ function getRuleContent(isCognitive) {
     : "Document verified outcome.";
 
   return `<!-- BEGIN FRIDAY-PROTOCOL (AUTO-INJECTED) -->
-# 🛡️ FRIDAY-PROTOCOL v2.0: PRIMARY GOVERNANCE LAW (${cognitiveModeTitle})
+# 🛡️ FRIDAY-PROTOCOL v2.1: PRIMARY GOVERNANCE LAW (${cognitiveModeTitle})
 All engineering tasks, feature additions, coding, refactors, and system modifications MUST strictly adhere to this protocol:
 
 ## 1. THE 5 IRON LAWS
 1. **Law of Deliberation:** The AI is strictly FORBIDDEN from generating or modifying any code before an Implementation Plan is explicitly approved by the User.
-2. **Law of 6D Lifecycle Matrix & STRIDE:** Must map the entire feature journey across all 6 dimensions (*Source -> Runtime State -> Persistence -> Downstream Consumers -> Security/STRIDE -> Failure Modes*).
+2. **Law of 6D Lifecycle Matrix & Anti-Wipe:** Must map the entire feature journey across all 6 dimensions (*Source -> Runtime State -> Persistence -> Downstream Consumers -> Security/STRIDE -> Failure Modes*). Mandatory Whole-Project Pre-Scan to guarantee existing databases are NEVER wiped.
 3. **Law of Security-First (8 Pillars BSSN + UU PDP):** SAST (Auth, SQLi, DTOs, Uploads, Audit Trail, UU PDP/Blind Indexing, Throttling, RBAC) must pass BEFORE functional UAT.
 4. **Law of Empirical Proof:** Never declare completion without objective proof (exit code 0, HTTP 200 OK, test coverage >= 80%, terminal logs).
 ${law5Text}
@@ -102,16 +102,22 @@ Even if 'Always Proceed', auto-approval, or YOLO mode is enabled:
 - **Exclusion of Robot Tokens:** Automated tokens like 'Proceed' or 'Approve' are purged. Code editing tools are programmatically locked until the User explicitly submits a manual token: \`['LGTM', 'CONFIRMED', 'EXECUTE', 'GO', 'OKE', 'GASS']\`.
 - **Zero-Tool Turn Termination:** Once the Implementation Plan is drafted, the agent MUST CALL ZERO TOOLS and immediately terminate its turn.
 
-## 3. THE 8-PHASE EXECUTION PIPELINE
+## 3. ANTI-WIPE DATABASE SAFEGUARD (ZERO-DATA-LOSS)
+- **Destructive Command Ban:** Strictly FORBIDDEN from running \`migrate:fresh\`, \`migrate:reset\`, \`db:wipe\`, \`DROP DATABASE\`, or \`TRUNCATE\` on active/dev databases.
+- **Additive Migrations Only:** All schema evolutions must be non-destructive (\`ADD COLUMN\`, nullable fields, safe rollback).
+- **Test DB Isolation:** Test runners must use dedicated in-memory (\`:memory:\`) or isolated test databases, never the active project database.
+- **Foreign Key Cascade Protection:** Use \`ON DELETE SET NULL\` or \`RESTRICT\` for audit logs, telemetry, and critical records.
+
+## 4. THE 8-PHASE EXECUTION PIPELINE
 - **Fast-Path (Q&A / Info / Status):** Answer directly, concisely, without plan bureaucracy.
 - **Execution-Path (Feature / Coding / Config / Fix):**
-  1. *Phase 1 (Intent Analysis):* Analyze scope and requirements${phase1DssText}.
-  2. *Phase 2 (6D Lifecycle Planning & STRIDE):* Create Implementation Plan detailing all 6 dimensions and STRIDE threat analysis.
+  1. *Phase 1 (Intent Analysis & Whole-Project Pre-Scan):* Scan repository structure, configurations (\`.env\`, database configs, Docker volumes), map existing tables/records${phase1DssText}.
+  2. *Phase 2 (6D Lifecycle Planning & Anti-Wipe):* Create Implementation Plan detailing all 6 dimensions, STRIDE threat modeling, and explicit existing data retention strategy.
   3. *Phase 3 (The Iron Gate):* ZERO TOOLS. Halt turn. Await User approval token.
   4. *Phase 4 (Blueprint Recap):* Summarize confirmed files and execution scope.
   5. *Phase 5 (Clean Implementation):* Write minimal, secure, surgical code.
   6. *Phase 6 (SAST & Security Gate):* Audit against the 8 Pillars of Secure Coding & UU PDP. Patch vulnerabilities immediately.
-  7. *Phase 7 (Empirical UAT):* Verify full chain (Preview -> Save -> Downstream Export) + anti-regression + multi-role check. Gather terminal proof.
+  7. *Phase 7 (Empirical UAT):* Verify full chain (Preview -> Save -> Downstream Export) + anti-regression + multi-role check + verify existing database records remain intact. Gather terminal proof.
   8. *Phase 8 (Completion & Sign-off):* ${phase8RetainText} Present evidence-backed summary.
 <!-- END FRIDAY-PROTOCOL -->`;
 }

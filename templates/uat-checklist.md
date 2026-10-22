@@ -1,6 +1,6 @@
 # 🧪 Empirical UAT & Evidence Checklist (BSSN & DevSecOps Aligned)
 
-> **Standard:** FRIDAY-PROTOCOL v2.0.0  
+> **Standard:** FRIDAY-PROTOCOL v2.1.0  
 > **Mandate:** Record hard, objective proof during **Phase 7 (Empirical UAT)** BEFORE declaring any task complete. No task may be marked done based on assumptions or hypothetical code reviews.
 
 ---
@@ -17,25 +17,30 @@
 - [ ] **Expected:** Data persists accurately from database/storage without reverting to default presets.
 - [ ] **Empirical Proof:** `[Paste database query row / file inspection proof]`
 
-### 1.3 Persistence $\rightarrow$ Downstream Consumers & Queues
+### 1.3 Existing Data Retention (Anti-Wipe / Zero-Data-Loss Verification)
+- [ ] **Action:** Verify pre-update vs post-update database table row counts and schema integrity.
+- [ ] **Expected:** Existing database records remain 100% intact, zero data wiped, non-destructive migration verified.
+- [ ] **Empirical Proof:** `[Paste pre/post row count query output or migration log]`
+
+### 1.4 Persistence $\rightarrow$ Downstream Consumers & Queues
 - [ ] **Action:** Trigger export (PDF, Excel, report) or background worker queue.
 - [ ] **Expected:** Downstream engine consumes persisted state; sensitive PII is masked; jobs complete with status `COMPLETED`.
 - [ ] **Empirical Proof:** `[Paste worker log / PDF inspection verification]`
 
-### 1.4 Security & Multi-Role Negative Verification (BFLA/BOLA)
+### 1.5 Security & Multi-Role Negative Verification (BFLA/BOLA)
 - [ ] **Admin Test:** Privileged user accesses target route and receives `200 OK`.
 - [ ] **Non-Admin Negative Test:** Regular authenticated user or anonymous guest attempts same action and receives strict `403 Forbidden` or `401 Unauthorized`.
 - [ ] **Channel Isolation Test:** Ensure WebSocket alerts are scoped (`io.to('admin')`), never leaked to regular clients.
 - [ ] **Empirical Proof:** `[Paste curl command / HTTP status codes]`
 
-### 1.5 UU PDP & Audit Trail Verification
+### 1.6 UU PDP & Audit Trail Verification
 - [ ] **Data at Rest Check:** Database records confirm sensitive PII (NIK, salary) is stored encrypted (**AES-256-CBC**).
 - [ ] **Blind Index Check:** Query by `*_hash` returns exact match efficiently without plaintext leak.
 - [ ] **Audit Log Verification:** Query `audit_logs` table confirms an immutable entry was written:
   - `actor_id`, `action_type`, `resource_id`, `timestamp`, `ip_address`, `before_after_json`.
 - [ ] **Empirical Proof:** `[Paste select * from audit_logs output]`
 
-### 1.6 Pre-Release Security Scans (SAST & SCA)
+### 1.7 Pre-Release Security Scans (SAST & SCA)
 - [ ] **Gitleaks Scan:** Zero secrets detected (`Exit Code 0`).
 - [ ] **Trivy fs Scan:** Zero HIGH or CRITICAL CVEs in dependencies (`Exit Code 0`).
 - [ ] **Test Coverage:** Automated unit/feature test suite passes with coverage $\ge 80\%$.
@@ -50,4 +55,4 @@
 
 ---
 
-> **Sign-Off Statement:** *"I hereby confirm with empirical proof that all 6 dimensions of the feature are functional, the 8 pillars of secure coding are upheld, and no regressions exist in adjacent systems."*
+> **Sign-Off Statement:** *"I hereby confirm with empirical proof that all 6 dimensions of the feature are functional, existing persistent database records remain completely intact (Zero Data Loss), the 8 pillars of secure coding are upheld, and no regressions exist in adjacent systems."*

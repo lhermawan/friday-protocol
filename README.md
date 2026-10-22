@@ -2,7 +2,7 @@
   <img src="assets/mascot.png" alt="FRIDAY-PROTOCOL Mascot" width="320"/>
 </p>
 
-# 🛡️ FRIDAY-PROTOCOL v2.0
+# 🛡️ FRIDAY-PROTOCOL v2.1
 
 > **F**ramework for **R**igorous, **I**ntelligent, **D**eliberate, and **A**utonomous **Y**ields  
 > *The Spec-Driven, DevSecOps-First, and BSSN-Aligned Governance Protocol for Autonomous AI Agents.*
@@ -15,14 +15,15 @@
 
 ---
 
-## ⚡ What is FRIDAY-PROTOCOL v2.0?
+## ⚡ What is FRIDAY-PROTOCOL v2.1?
 
 Most AI coding agents suffer from three fatal flaws:
 1. **Eager Execution Bias:** The AI begins generating code immediately before you review the architecture or consider security threats.
 2. **Ping-Pong QA & Tunnel Vision:** Fixing one UI bug silently breaks downstream PDF generation, state persistence, or worker queues.
 3. **Broken Access Control & Security Negligence:** The AI hides buttons via client-side CSS (`display: none` / `v-if`) while leaving backend endpoints and WebSocket channels completely unguarded.
 
-**FRIDAY-PROTOCOL v2.0 transforms your AI into an elite, security-conscious Staff Engineer** by integrating:
+**FRIDAY-PROTOCOL transforms your AI into an elite, security-conscious Staff Engineer** by integrating:
+- **Mandatory Whole-Project Pre-Scan & Anti-Wipe Database Safeguards (Zero Data Loss)**.
 - **NIST SP 800-160/154 Adversarial Thinking** & **STRIDE Threat Modeling**.
 - **8 Pillars of Secure Backend Engineering (BSSN-Aligned)**.
 - **UU No. 27/2022 Pelindungan Data Pribadi (UU PDP)** compliance with AES-256-CBC and Blind Indexing.
@@ -30,10 +31,24 @@ Most AI coding agents suffer from three fatal flaws:
 
 ---
 
+## 🌟 What's New in v2.1.0 (The Anti-Wipe & Architecture Guard Release)
+
+FRIDAY-PROTOCOL v2.1.0 introduces strict safeguards against one of the most frustrating AI coding traps: **accidental database wipes and lost persistent data during feature updates**.
+
+- 🔍 **Mandatory Whole-Project Pre-Scan (Phase 1):** Before touching code or proposing an implementation plan, the agent must inspect root environment files (`.env`), database connections (`config/database.*`, Prisma, Drizzle, etc.), Docker mounts, and existing tables to fully understand the project architecture.
+- 🛡️ **Zero-Data-Loss Anti-Wipe Safeguard:**
+  - **Destructive Command Ban:** Strictly prohibits AI from executing `migrate:fresh`, `migrate:reset`, `db:wipe`, `DROP DATABASE`, or `TRUNCATE` on active/development databases.
+  - **Additive Migrations Only:** All new schema evolutions must be non-destructive (`ADD COLUMN`, safe nullable fields, and backward-compatible defaults).
+  - **Foreign Key Cascade Protection:** Mandates `ON DELETE SET NULL` or `RESTRICT` on telemetry, audit trails, and sensitive relational records to prevent cascading mass deletions when parent entities are reset.
+- 🧪 **Test Suite Database Isolation:** Enforces that automated test runners (`phpunit`, `pytest`, `jest`) execute against ephemeral in-memory (`:memory:`) or dedicated isolated test databases (`_test`), never against active development or staging databases.
+- 📋 **Enhanced Lifecycle & UAT Checklists:** `plan-template.md` and `uat-checklist.md` now feature explicit pre-scan declarations and empirical verification that existing database record counts remain intact after deployment.
+
+---
+
 ## 🏛️ The 5 Iron Laws
 
 1. **Law of Deliberation:** The AI is strictly FORBIDDEN from touching code until the Operator explicitly approves the Implementation Plan.
-2. **Law of Universal 6D Lifecycle Matrix & STRIDE:** Every feature must map its journey across 6 dimensions (*Source $\rightarrow$ Runtime State $\rightarrow$ Persistence $\rightarrow$ Downstream Consumers $\rightarrow$ Security & STRIDE $\rightarrow$ Failure Modes*).
+2. **Law of Universal 6D Lifecycle Matrix & Anti-Wipe:** Every feature must map its journey across 6 dimensions (*Source $\rightarrow$ Runtime State $\rightarrow$ Persistence $\rightarrow$ Downstream Consumers $\rightarrow$ Security & STRIDE $\rightarrow$ Failure Modes*). Mandatory Whole-Project Pre-Scan to guarantee zero accidental database loss.
 3. **Law of Security-First (Early Gate):** SAST (8 Pillars BSSN + UU PDP) and Multi-Role checks must pass **BEFORE** functional UAT to eliminate regression loops.
 4. **Law of Empirical Proof:** The AI may never declare a task "complete" without hard, objective proof (exit code 0, HTTP 200 OK, test coverage $\ge 80\%$, terminal logs).
 5. **Law of Cognitive Closed-Loop (Optional):** Integrates with external Knowledge Graphs (e.g. MemoriaGraph) to query past decisions before planning and retain learned heuristics after deployment.
@@ -96,8 +111,8 @@ flowchart TD
     A["User Task Request"] --> B{"Request Type?"}
     B -->|"Q&A / Info / Status"| C["Fast-Path: Rapid Direct Answer"]
     
-    B -->|"Feature / Code / Sysadmin"| D["Phase 1: Ingestion & Intent Analysis (+ DSS query)"]
-    D --> E["Phase 2: Universal 6D Matrix & STRIDE Planning (Plan Artifact)"]
+    B -->|"Feature / Code / Sysadmin"| D["Phase 1: Ingestion, Whole-Project Pre-Scan & Intent Analysis (+ DSS query)"]
+    D --> E["Phase 2: Universal 6D Matrix Planning, STRIDE & Anti-Wipe (Plan Artifact)"]
     
     E --> F["Phase 3: The Iron Gate (ZERO TOOLS - Await Operator Approval)"]
     F -->|"User Requests Revision"| E
@@ -107,7 +122,7 @@ flowchart TD
     H --> I["Phase 6: SAST & 8 Pillars Security Hardening (Patch in Place)"]
     I -->|"Vulnerability Found"| H
     
-    I --> J["Phase 7: Full-Chain Empirical UAT (Evidence Gathering)"]
+    I --> J["Phase 7: Full-Chain Empirical UAT & Zero-Data-Loss Verification"]
     J -->|"Test Failed / Regression"| H
     
     J -->|"All Tests Passed"| K["Phase 8: Cognitive Retention & Sign-Off (Save to Second Brain)"]

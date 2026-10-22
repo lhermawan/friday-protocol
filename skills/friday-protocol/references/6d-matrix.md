@@ -1,8 +1,8 @@
 # 📊 Universal 6D Lifecycle Matrix & Threat Modeling Guide
 
-> **Standard:** FRIDAY-PROTOCOL v2.0.0  
+> **Standard:** FRIDAY-PROTOCOL v2.1.0  
 > **Mandate:** The **Universal 6D Lifecycle Matrix** forces AI agents and engineers to examine the complete end-to-end journey of every feature before writing any code.  
-> **Integration:** Combines Full Data-Flow Tracing with **STRIDE Threat Modeling (NIST SP 800-160/154)** and CIA Triad mapping to eradicate "Ping-Pong QA" and architectural oversights.
+> **Integration:** Combines Full Data-Flow Tracing with **Anti-Wipe Database Safeguards**, **STRIDE Threat Modeling (NIST SP 800-160/154)**, and CIA Triad mapping to eradicate "Ping-Pong QA", architectural oversights, and catastrophic data loss.
 
 ---
 
@@ -25,10 +25,14 @@ Every Implementation Plan MUST address each dimension in concrete detail:
   - Reactive sync: UI must update reactively without requiring manual reloads.
   - Lifecycle cleanup: Unsubscribe event listeners, WebSocket rooms, and worker polling on component unmount to prevent memory leaks and zombie connections.
 
-### 3. Storage & Persistence Dimension (The Source of Truth)
+### 3. Storage & Persistence Dimension (The Source of Truth & Anti-Wipe Invariant)
 - **Persistence Target:** PostgreSQL, MySQL, Redis, SQLite, disk files, S3 buckets.
-- **Verification & Defense Rules:**
-  - **Cold Restart Test:** Hard-refresh (Ctrl+F5) or reboot the backend service. Data must survive and not silently revert to factory defaults.
+- **Anti-Wipe & Zero-Data-Loss Invariant:**
+  - **Zero Destructive Commands:** Strictly FORBIDDEN from running `migrate:fresh`, `migrate:reset`, `db:wipe`, `DROP TABLE`, or `TRUNCATE` against active dev or production databases.
+  - **Additive Migrations Only:** New schema changes must be non-destructive (`ALTER TABLE ... ADD COLUMN`, nullable defaults, or multi-step backfills).
+  - **Foreign Key Cascade Protection:** Never use `ON DELETE CASCADE` blindly on critical audit logs, telemetry, or security events; use `ON DELETE SET NULL` or `RESTRICT` to prevent mass orphan data loss.
+  - **Test Suite Isolation:** Guarantee that unit/e2e test runners use isolated ephemeral databases (e.g., `:memory:` or `_test`), never the active development database.
+  - **Cold Restart Test:** Hard-refresh the page (Ctrl+F5) or restart the backend process. Does the state remain intact, and do existing database records survive without falling back to defaults?
   - **UU PDP (PII Protection):** Sensitive data (NIK, financial details, passwords) MUST be encrypted at rest using authenticated **AES-256-CBC/GCM**.
   - **Blind Indexing:** Implement indexed hash columns (`nik_hash = HMAC(nik, secret)`) for instant searchability without plaintext exposure.
   - **Audit Non-Repudiation:** Record actor ID, action enum, target resource, timestamp, and IP into immutable audit tables. Foreign keys for security logs must use `ON DELETE SET NULL`.
