@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FridayProtocolSecurityAuditReport",
+  "description": "Machine-readable schema for FRIDAY-PROTOCOL and Cloudflare-aligned Security Audit findings.",
+  "type": "object",
+  "required": ["protocol_version", "generated_at", "audit_target", "summary", "findings"],
+  "properties": {
+    "protocol_version": {
+      "type": "string",
+      "example": "2.2.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "audit_target": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total_inspected", "confirmed", "needs_validation", "rejected"],
+      "properties": {
+        "total_inspected": { "type": "integer", "minimum": 0 },
+        "confirmed": { "type": "integer", "minimum": 0 },
+        "needs_validation": { "type": "integer", "minimum": 0 },
+        "rejected": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "fingerprint", "title", "verdict", "attack_class", "source_trace"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^FIND-[0-9]{3,}$"
+          },
+          "fingerprint": {
+            "type": "string",
+            "description": "Deterministic SHA-256 or root-cause identifier."
+          },
+          "title": {
+            "type": "string"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": ["confirmed", "needs_validation", "rejected"]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"]
+          },
+          "attack_class": {
+            "type": "string",
+            "description": "Category such as AI_LLM, DATA_LIFECYCLE, DESKTOP_IPC, AUTH_BFLA, SQLI, CSRF, etc."
+          },
+          "source_trace": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["file", "line", "code_snippet", "role"],
+              "properties": {
+                "file": { "type": "string" },
+                "line": { "type": "integer", "minimum": 1 },
+                "code_snippet": { "type": "string" },
+                "role": { "type": "string", "enum": ["SOURCE", "PROPAGATOR", "SANITIZER", "SINK"] }
+              }
+            }
+          },
+          "observed_impact": {
+            "type": "string",
+            "description": "Required for confirmed findings; concrete impact demonstrating risk."
+          },
+          "missing_fact": {
+            "type": "string",
+            "description": "Required for needs_validation findings; exact unknown runtime/cloud fact."
+          },
+          "validation_plan": {
+            "type": "string",
+            "description": "Plan to observe and resolve missing_fact safely."
+          },
+          "rejection_reason": {
+            "type": "string",
+            "description": "Required for rejected findings; empirical proof of safety or refutation."
+          },
+          "mitigating_control": {
+            "type": "string",
+            "description": "Existing code or architecture control that prevents exploitation."
+          },
+          "remediation": {
+            "type": "string",
+            "description": "Minimal, precise surgical code patch or mitigation."
+          }
+        }
+      }
+    }
+  }
+}

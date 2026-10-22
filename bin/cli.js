@@ -86,7 +86,7 @@ function getRuleContent(isCognitive) {
     : "Document verified outcome.";
 
   return `<!-- BEGIN FRIDAY-PROTOCOL (AUTO-INJECTED) -->
-# 🛡️ FRIDAY-PROTOCOL v2.1: PRIMARY GOVERNANCE LAW (${cognitiveModeTitle})
+# 🛡️ FRIDAY-PROTOCOL v2.2: PRIMARY GOVERNANCE LAW (${cognitiveModeTitle})
 All engineering tasks, feature additions, coding, refactors, and system modifications MUST strictly adhere to this protocol:
 
 ## 1. THE 5 IRON LAWS
@@ -108,7 +108,11 @@ Even if 'Always Proceed', auto-approval, or YOLO mode is enabled:
 - **Test DB Isolation:** Test runners must use dedicated in-memory (\`:memory:\`) or isolated test databases, never the active project database.
 - **Foreign Key Cascade Protection:** Use \`ON DELETE SET NULL\` or \`RESTRICT\` for audit logs, telemetry, and critical records.
 
-## 4. THE 8-PHASE EXECUTION PIPELINE
+## 4. ADVERSARIAL DISPROVER & AUDIT GATE (CLOUDFLARE STANDARD)
+- **Adversarial Verification:** Security claims and candidate vulnerabilities must undergo an adversarial refutation pass attempting to disprove the exploitability before confirmation.
+- **Zero Hallucinated Severity:** If an external config is missing, classify as \`needs_validation\` without fabricating high severity. If mitigating controls exist, classify as \`rejected\`.
+
+## 5. THE 8-PHASE EXECUTION PIPELINE
 - **Fast-Path (Q&A / Info / Status):** Answer directly, concisely, without plan bureaucracy.
 - **Execution-Path (Feature / Coding / Config / Fix):**
   1. *Phase 1 (Intent Analysis & Whole-Project Pre-Scan):* Scan repository structure, configurations (\`.env\`, database configs, Docker volumes), map existing tables/records${phase1DssText}.
@@ -116,7 +120,7 @@ Even if 'Always Proceed', auto-approval, or YOLO mode is enabled:
   3. *Phase 3 (The Iron Gate):* ZERO TOOLS. Halt turn. Await User approval token.
   4. *Phase 4 (Blueprint Recap):* Summarize confirmed files and execution scope.
   5. *Phase 5 (Clean Implementation):* Write minimal, secure, surgical code.
-  6. *Phase 6 (SAST & Security Gate):* Audit against the 8 Pillars of Secure Coding & UU PDP. Patch vulnerabilities immediately.
+  6. *Phase 6 (SAST & Adversarial Gate):* Audit against 8 Pillars of BSSN, deep threat catalogs (AI/LLM, Data Lifecycle, Desktop IPC), and run Adversarial Disprover pass.
   7. *Phase 7 (Empirical UAT):* Verify full chain (Preview -> Save -> Downstream Export) + anti-regression + multi-role check + verify existing database records remain intact. Gather terminal proof.
   8. *Phase 8 (Completion & Sign-off):* ${phase8RetainText} Present evidence-backed summary.
 <!-- END FRIDAY-PROTOCOL -->`;
@@ -241,19 +245,25 @@ async function main() {
   const isHelp = args.includes('--help') || args.includes('-h');
   const isYes = args.includes('--yes') || args.includes('-y');
   const isUpdate = args.includes('--update') || args.includes('update');
+  const isAudit = args.includes('--audit');
+  const auditPathIndex = args.findIndex((a) => a === '--audit');
+  const auditTargetArg = (auditPathIndex !== -1 && args[auditPathIndex + 1] && !args[auditPathIndex + 1].startsWith('-'))
+    ? path.resolve(args[auditPathIndex + 1])
+    : process.cwd();
   const recipeIndex = args.findIndex((a) => a === '--recipe');
   const recipeArg = recipeIndex !== -1 ? args[recipeIndex + 1] : null;
 
   if (isHelp) {
     console.log(`
 ${pc.bold(pc.cyan(`🛡️  FRIDAY-PROTOCOL CLI v${currentVersion}`))}
-BSSN-Aligned, Spec-Driven DevSecOps Governance for Autonomous AI Agents
+BSSN-Aligned, Spec-Driven DevSecOps & Adversarial Security Audit for AI Agents
 
 ${pc.bold('USAGE:')}
   npx friday-protocol [options]
 
 ${pc.bold('OPTIONS:')}
   -y, --yes          Run non-interactively with defaults (Universal, Global, Standalone)
+  --audit [path]     Scaffold Adversarial Security Audit suite into target repository
   --update           Update all existing installed governance rules and skills to v${currentVersion}
   --env <target>     Target environment: all, antigravity, claude, cursor (default: all)
   --scope <scope>    Installation scope: global, workspace (default: global)
@@ -262,6 +272,60 @@ ${pc.bold('OPTIONS:')}
                      [gitlab-ci | github-actions | pre-commit | dast | docker-lab | all]
   -h, --help         Show this help message
 `);
+    process.exit(0);
+  }
+
+  // Handle security audit scaffolding & execution
+  if (isAudit) {
+    const s = p.spinner();
+    s.start(`Scaffolding FRIDAY-PROTOCOL Security Audit Suite for ${pc.cyan(auditTargetArg)}...`);
+
+    const auditDir = path.join(auditTargetArg, '.friday', 'audit');
+    if (!fs.existsSync(auditDir)) {
+      fs.mkdirSync(auditDir, { recursive: true });
+    }
+
+    const schemaSrc = path.join(packageRoot, 'core', 'schemas', 'report-schema.json');
+    const schemaDest = path.join(auditDir, 'report-schema.json');
+    copyFile(schemaSrc, schemaDest);
+
+    const findingsFile = path.join(auditDir, 'findings.json');
+    if (!fs.existsSync(findingsFile)) {
+      const templateFindings = {
+        protocol_version: currentVersion,
+        generated_at: new Date().toISOString(),
+        audit_target: path.basename(auditTargetArg),
+        summary: {
+          total_inspected: 0,
+          confirmed: 0,
+          needs_validation: 0,
+          rejected: 0
+        },
+        findings: []
+      };
+      fs.writeFileSync(findingsFile, JSON.stringify(templateFindings, null, 2), 'utf-8');
+    }
+
+    s.stop('Security Audit Suite scaffolded successfully!');
+
+    console.log(`
+${pc.bold(pc.green('🛡️  FRIDAY-PROTOCOL: Adversarial Security Audit Mode Activated'))}
+${pc.dim('Adversarial Rule: The agent who hunts a finding must never validate it.')}
+
+${pc.bold('Audit Workspace:')} ${pc.cyan(auditDir)}
+  - Schema:    ${pc.dim(schemaDest)}
+  - Findings:  ${pc.dim(findingsFile)}
+
+${pc.bold('Threat Catalogs Available:')}
+  - AI & LLM:       ${pc.magenta('skills/friday-protocol/references/threats-ai-and-llm.md')}
+  - Data Lifecycle: ${pc.magenta('skills/friday-protocol/references/threats-data-lifecycle.md')}
+  - Desktop & IPC:  ${pc.magenta('skills/friday-protocol/references/threats-desktop-ipc.md')}
+
+${pc.bold('Validation Command:')}
+  ${pc.cyan(`node ${path.relative(process.cwd(), path.join(packageRoot, 'bin', 'validate-findings.cjs'))} ${path.relative(process.cwd(), findingsFile)}`)}
+`);
+
+    p.outro(pc.green('🚀 Ready for hunting! Instruct your AI: "Audit this codebase using FRIDAY-PROTOCOL"'));
     process.exit(0);
   }
 

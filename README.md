@@ -2,10 +2,10 @@
   <img src="assets/mascot.png" alt="FRIDAY-PROTOCOL Mascot" width="320"/>
 </p>
 
-# 🛡️ FRIDAY-PROTOCOL v2.1
+# 🛡️ FRIDAY-PROTOCOL v2.2
 
 > **F**ramework for **R**igorous, **I**ntelligent, **D**eliberate, and **A**utonomous **Y**ields  
-> *The Spec-Driven, DevSecOps-First, and BSSN-Aligned Governance Protocol for Autonomous AI Agents.*
+> *The Spec-Driven, DevSecOps-First, and BSSN-Aligned Governance & Adversarial Security Protocol for Autonomous AI Agents.*
 
 [![npm version](https://img.shields.io/npm/v/friday-protocol.svg?style=flat&color=cb3837)](https://www.npmjs.com/package/friday-protocol)
 [![npm downloads](https://img.shields.io/npm/dm/friday-protocol.svg?style=flat&color=blue)](https://www.npmjs.com/package/friday-protocol)
@@ -15,7 +15,7 @@
 
 ---
 
-## ⚡ What is FRIDAY-PROTOCOL v2.1?
+## ⚡ What is FRIDAY-PROTOCOL v2.2?
 
 Most AI coding agents suffer from three fatal flaws:
 1. **Eager Execution Bias:** The AI begins generating code immediately before you review the architecture or consider security threats.
@@ -23,11 +23,27 @@ Most AI coding agents suffer from three fatal flaws:
 3. **Broken Access Control & Security Negligence:** The AI hides buttons via client-side CSS (`display: none` / `v-if`) while leaving backend endpoints and WebSocket channels completely unguarded.
 
 **FRIDAY-PROTOCOL transforms your AI into an elite, security-conscious Staff Engineer** by integrating:
+- **Cloudflare-Inspired Adversarial Disprover Gate** (eliminates false-positive AI hallucinations).
 - **Mandatory Whole-Project Pre-Scan & Anti-Wipe Database Safeguards (Zero Data Loss)**.
+- **Deep-Domain Threat Catalogs** (AI & LLMs, Data Lifecycle, Desktop & Local IPC).
 - **NIST SP 800-160/154 Adversarial Thinking** & **STRIDE Threat Modeling**.
 - **8 Pillars of Secure Backend Engineering (BSSN-Aligned)**.
 - **UU No. 27/2022 Pelindungan Data Pribadi (UU PDP)** compliance with AES-256-CBC and Blind Indexing.
 - **Turnkey DevSecOps Pipeline Recipes** (GitLab CI, GitHub Actions, Pre-Commit, OWASP ZAP DAST).
+
+---
+
+## 🌟 What's New in v2.2.0 (The Cloudflare Adversarial Audit Release)
+
+FRIDAY-PROTOCOL v2.2.0 integrates architectural breakthroughs inspired by **Cloudflare's Security Audit Skill**:
+
+- ⚔️ **Adversarial Disprover Gate (Phase 6):** Eliminates AI confirmation bias and false-positive hallucinations. A fresh verifier agent is tasked with **refuting** proposed vulnerabilities by identifying existing mitigating code controls.
+- 🎯 **Deep-Domain Threat Catalogs:**
+  - 🤖 **AI & LLM Threat Catalog:** Audits RAG prompt injection, memory poisoning, tool sink injection, MCP server identity collision, and action-binding approval drift.
+  - 💾 **Data Lifecycle & Anti-Wipe Threat Catalog:** Audits multi-tenant isolation leaks, migration rollback confusion, export scope expansion, and soft-delete bypasses.
+  - 🖥️ **Desktop, Mobile & Local IPC Threat Catalog:** Audits Electron native bridges, webview universal file access, deep-link hijacking, and local IPC/socket authentication gaps.
+- 📋 **Machine-Readable Findings Standard:** Integrates `core/schemas/report-schema.json` with distinct verdicts: `confirmed` (with bounded observed impact), `needs_validation` (exact missing runtime fact), and `rejected`.
+- 🛠️ **CLI Audit Runner & Zero-Dependency Validator:** Run `npx friday-protocol --audit [path]` to scaffold audit workspaces, and validate findings via `bin/validate-findings.cjs`.
 
 ---
 
@@ -152,22 +168,28 @@ All code modified under FRIDAY-PROTOCOL must satisfy the 8 security pillars in [
 friday-protocol/
 ├── README.md                                  # Comprehensive Guide & Documentation
 ├── LICENSE                                    # MIT License
-├── package.json                               # npm package manifest (v2.0.0)
+├── package.json                               # npm package manifest (v2.2.0)
 ├── bin/
-│   └── cli.js                                 # Interactive CLI with recipe deployment
+│   ├── cli.js                                 # Interactive CLI with recipe deployment & audit runner
+│   └── validate-findings.cjs                  # Zero-dependency finding schema & reconciliation validator
 ├── core/
-│   └── rules/
-│       ├── GEMINI.md                          # Governance rule template for Gemini / Antigravity
-│       ├── CLAUDE.md                          # Governance rule template for Claude Code
-│       ├── .cursorrules                       # Governance rule template for Cursor / Windsurf
-│       └── AGENTS.md                          # Standard rule for Multi-Agent swarms
+│   ├── rules/
+│   │   ├── GEMINI.md                          # Governance rule template for Gemini / Antigravity
+│   │   ├── CLAUDE.md                          # Governance rule template for Claude Code
+│   │   ├── .cursorrules                       # Governance rule template for Cursor / Windsurf
+│   │   └── AGENTS.md                          # Standard rule for Multi-Agent swarms & Hunter-Verifier
+│   └── schemas/
+│       └── report-schema.json                 # Machine-readable audit findings JSON schema
 ├── skills/
 │   └── friday-protocol/
-│       ├── SKILL.md                           # Comprehensive SOP & 8-Phase Runbook
+│       ├── SKILL.md                           # Comprehensive SOP & 8-Phase Runbook (with Disprover Gate)
 │       └── references/
 │           ├── 6d-matrix.md                   # 6D Lifecycle Matrix & STRIDE Threat Modeling
 │           ├── sast-checklist.md              # 8 Pillars of Secure Backend & UU PDP Checklist
-│           └── devsecops-pipeline.md          # Architecture & Tooling Guide (Trivy, Gitleaks, ZAP)
+│           ├── devsecops-pipeline.md          # Architecture & Tooling Guide (Trivy, Gitleaks, ZAP)
+│           ├── threats-ai-and-llm.md          # Threat Catalog: AI/LLM, MCP, Prompt Injection & Tool Trust
+│           ├── threats-data-lifecycle.md      # Threat Catalog: Multi-tenant, Anti-Wipe & Export Integrity
+│           └── threats-desktop-ipc.md         # Threat Catalog: Desktop App & Electron/Tauri IPC Security
 ├── recipes/                                   # TURNKEY DEVSECOPS RECIPES
 │   ├── ci/
 │   │   ├── gitlab-ci-devsecops.yml            # GitLab CI pipeline configuration

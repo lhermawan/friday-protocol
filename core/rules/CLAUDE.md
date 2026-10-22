@@ -1,4 +1,4 @@
-# 🛡️ FRIDAY-PROTOCOL FOR CLAUDE CODE (v2.1)
+# 🛡️ FRIDAY-PROTOCOL FOR CLAUDE CODE (v2.2)
 
 <!-- BEGIN FRIDAY-PROTOCOL (AUTO-INJECTED) -->
 ## PRIMARY GOVERNANCE LAW (THE 5 IRON LAWS)
@@ -18,4 +18,8 @@
 - **Additive Migrations Only:** All schema evolutions must be non-destructive (`ADD COLUMN`, nullable fields, safe rollback).
 - **Test DB Isolation:** Test runners must use dedicated in-memory (`:memory:`) or isolated test databases, never the active project database.
 - **Foreign Key Cascade Protection:** Use `ON DELETE SET NULL` or `RESTRICT` for audit logs, telemetry, and critical records.
+
+## ADVERSARIAL DISPROVER & AUDIT GATE (CLOUDFLARE STANDARD)
+- **Adversarial Verification:** Security claims and candidate vulnerabilities must undergo an adversarial refutation pass attempting to disprove the exploitability before confirmation.
+- **Zero Hallucinated Severity:** If an external config is missing, classify as `needs_validation` without fabricating high severity. If mitigating controls exist, classify as `rejected`.
 <!-- END FRIDAY-PROTOCOL -->

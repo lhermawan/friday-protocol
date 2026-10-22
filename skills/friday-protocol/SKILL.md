@@ -1,13 +1,13 @@
 ---
 name: friday-protocol
 description: >-
-  The official FRIDAY-PROTOCOL v2.1 (BSSN-Aligned Cognitive DevSecOps, Anti-Hallucination &
-  Anti-Wipe Database Framework). Use whenever designing, coding, upgrading features, refactoring,
-  or modifying system configurations to enforce the 5 Iron Laws, 6D Lifecycle Matrix + STRIDE,
-  Whole-Project Pre-Scan, Anti-Wipe Database Guard, 8-Pillars SAST/UU PDP gate, and empirical UAT.
+  The official FRIDAY-PROTOCOL v2.2 (BSSN-Aligned Cognitive DevSecOps, Adversarial Security Audit,
+  Anti-Hallucination & Anti-Wipe Database Framework). Use whenever designing, coding, upgrading features,
+  refactoring, auditing security, or modifying system configurations to enforce the 5 Iron Laws,
+  6D Lifecycle Matrix + STRIDE, Adversarial Disprover Gate, and empirical UAT.
 ---
 
-# 🛡️ FRIDAY-PROTOCOL v2.1: Cognitive DevSecOps & Secure SDLC Governance
+# 🛡️ FRIDAY-PROTOCOL v2.2: Cognitive DevSecOps & Adversarial Security Governance
 
 FRIDAY-PROTOCOL transforms AI agents from reckless code-generators into disciplined Staff Engineers.
 It aligns automated software development with **BSSN RI Secure Application Guidelines**, **OWASP API Top 10**, and **UU No. 27/2022 Pelindungan Data Pribadi (UU PDP)**.
@@ -72,8 +72,8 @@ The plan MUST detail the [Universal 6D Lifecycle Matrix](./references/6d-matrix.
 - No unsolicited scope expansion or premature abstractions.
 - Adhere to single-responsibility endpoints and DTO strictness.
 
-### Phase 6: SAST & Security Hardening (8 Pillars BSSN)
-- Audit code against [SAST Checklist](./references/sast-checklist.md):
+### Phase 6: SAST, Adversarial Verification & Security Hardening
+- Audit code against [SAST Checklist](./references/sast-checklist.md) & 8 Pillars of BSSN:
   1. *Authentication:* Short TTL JWT (5–15 min) + HttpOnly cookies + Revocation list.
   2. *SQL Injection:* Parameterized queries / ORM queries only.
   3. *Mass Assignment:* Explicit `$fillable` / strict DTOs.
@@ -82,6 +82,17 @@ The plan MUST detail the [Universal 6D Lifecycle Matrix](./references/6d-matrix.
   6. *UU PDP:* AES-256-CBC encryption + blind indexing (`nik_hash`) + PII masking in UI/API.
   7. *DoS Defense:* Rate limiting middleware (5 req/min) + invisible honeypots.
   8. *Access Control:* Server-side Gate/Policy enforcement (BFLA/BOLA) + room-scoped broadcasts.
+- **Deep-Domain Threat Catalogs:**
+  - Consult [AI & LLM Threat Catalog](./references/threats-ai-and-llm.md) for agentic loops, prompt injection, RAG bleed, and MCP security.
+  - Consult [Data Lifecycle & Anti-Wipe Catalog](./references/threats-data-lifecycle.md) for tenant isolation, migration safety, and export overreach.
+  - Consult [Desktop & Local IPC Catalog](./references/threats-desktop-ipc.md) for Electron bridge, webview security, and local IPC auth.
+- **The Adversarial Disprover Gate (Cloudflare Standard):**
+  - *The agent that proposes a security finding or patch must never be the sole judge of its validity.*
+  - Deploy an adversarial verification thought-pass (or subagent in multi-agent mode) whose objective is to **refute** the finding.
+  - If existing controls prevent exploitation $\rightarrow$ classify as `rejected`.
+  - If decisive runtime or cloud facts cannot be observed locally $\rightarrow$ classify as `needs_validation` without fabricating severity.
+  - Only promote to `confirmed` if source trace from lower-trust source to sink is proven with bounded impact.
+- Structured audit output may be validated via `node bin/validate-findings.cjs <path/to/findings.json>`.
 - Patch all vulnerabilities immediately before proceeding.
 
 ### Phase 7: Full-Chain UAT & Anti-Regression
