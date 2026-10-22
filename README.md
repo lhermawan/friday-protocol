@@ -242,7 +242,7 @@ All code modified under FRIDAY-PROTOCOL must satisfy the 8 security pillars in [
 friday-protocol/
 ├── README.md                                  # Comprehensive Guide & Documentation
 ├── LICENSE                                    # MIT License
-├── package.json                               # npm package manifest (v2.2.1)
+├── package.json                               # npm package manifest (v2.2.2)
 ├── bin/
 │   ├── cli.js                                 # Interactive CLI with recipe deployment & audit runner
 │   └── validate-findings.cjs                  # Zero-dependency finding schema & reconciliation validator

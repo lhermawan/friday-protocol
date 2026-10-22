@@ -329,24 +329,24 @@ ${pc.bold('EXAMPLES:')}
 
     s.stop('Security Audit Suite scaffolded successfully!');
 
-    const relValidator = path.relative(process.cwd(), validatorDest) || '.friday/audit/validate-findings.cjs';
-    const relFindings = path.relative(process.cwd(), findingsFile) || '.friday/audit/findings.json';
+    const relValidator = (path.relative(process.cwd(), validatorDest) || '.friday/audit/validate-findings.cjs').replace(/\\/g, '/');
+    const relFindings = (path.relative(process.cwd(), findingsFile) || '.friday/audit/findings.json').replace(/\\/g, '/');
 
     console.log(`
 ${pc.bold(pc.green('🛡️  FRIDAY-PROTOCOL: Adversarial Security Audit Mode Activated'))}
 ${pc.dim('Adversarial Rule: The agent who hunts a finding must never validate it.')}
 
-${pc.bold('Audit Workspace:')} ${pc.cyan(auditDir)}
-  - Schema:    ${pc.dim(schemaDest)}
-  - Findings:  ${pc.dim(findingsFile)}
-  - Validator: ${pc.dim(validatorDest)}
+${pc.bold('Audit Workspace:')} ${pc.cyan(auditDir.replace(/\\/g, '/'))}
+  - Schema:    ${pc.dim(schemaDest.replace(/\\/g, '/'))}
+  - Findings:  ${pc.dim(findingsFile.replace(/\\/g, '/'))}
+  - Validator: ${pc.dim(validatorDest.replace(/\\/g, '/'))}
 
 ${pc.bold('Threat Catalogs Available:')}
   - AI & LLM:       ${pc.magenta('skills/friday-protocol/references/threats-ai-and-llm.md')}
   - Data Lifecycle: ${pc.magenta('skills/friday-protocol/references/threats-data-lifecycle.md')}
   - Desktop & IPC:  ${pc.magenta('skills/friday-protocol/references/threats-desktop-ipc.md')}
 
-${pc.bold('Validation Command (In-Project):')}
+${pc.bold('Validation Command (Cross-Platform):')}
   ${pc.cyan(`node ${relValidator} ${relFindings}`)}
 `);
 

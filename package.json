@@ -1,6 +1,6 @@
 {
   "name": "friday-protocol",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "BSSN-Aligned, Spec-Driven DevSecOps & Adversarial Security Audit Framework for Autonomous AI Agents",
   "main": "./bin/cli.js",
   "bin": {
